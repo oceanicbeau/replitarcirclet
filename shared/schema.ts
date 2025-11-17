@@ -17,7 +17,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 
-export type ObjectType = "waste-bin" | "syringe" | "dog-poop";
+export type ObjectType = "graffiti" | "syringe" | "dog-poop";
 
 export interface DetectedObject {
   type: ObjectType;

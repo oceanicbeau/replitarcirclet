@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { QrCode, Trash2, Syringe, Dog } from "lucide-react";
+import { QrCode, Syringe, Dog } from "lucide-react";
 import QRScanner from "@/components/QRScanner";
 import CameraView from "@/components/CameraView";
 import ObjectIndicator from "@/components/ObjectIndicator";
@@ -125,11 +125,11 @@ export default function Home() {
             <Button
               variant="outline"
               className="w-full justify-start h-12 hover-elevate active-elevate-2"
-              onClick={() => startQuickDemo("waste-bin")}
-              data-testid="button-demo-waste-bin"
+              onClick={() => startQuickDemo("graffiti")}
+              data-testid="button-demo-graffiti"
             >
-              <Trash2 className="w-5 h-5 mr-3" style={{ color: "hsl(142, 70%, 45%)" }} />
-              <span>Waste Bin Demo</span>
+              <span className="text-xl mr-3">🎨</span>
+              <span>Graffiti Demo</span>
             </Button>
 
             <Button
@@ -156,7 +156,7 @@ export default function Home() {
 
         <div className="pt-6 border-t border-border">
           <p className="text-xs text-muted-foreground text-center" data-testid="text-instructions">
-            For full demo: Print QR codes with text "waste-bin", "syringe", or "dog-poop"
+            For full demo: Print QR codes with text "graffiti", "syringe", or "dog-poop"
           </p>
         </div>
       </div>

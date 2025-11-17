@@ -1,38 +1,38 @@
-import { ObjectData } from "@shared/schema";
+import { ObjectData, ObjectType } from "@shared/schema";
 
 export const OBJECT_DATABASE: Record<string, ObjectData> = {
-  "waste-bin": {
-    type: "waste-bin",
-    name: "Waste Bin",
-    icon: "🗑️",
-    accentColor: "hsl(142, 70%, 45%)",
-    greeting: "Waste bin detected. How can I help you today?",
+  "graffiti": {
+    type: "graffiti" as ObjectType,
+    name: "Graffiti",
+    icon: "🎨",
+    accentColor: "hsl(280, 70%, 50%)",
+    greeting: "Graffiti detected. See removal and reporting guidelines below.",
     quickActions: [
       {
         id: "disposal",
         label: "What do I do?",
-        response: "This is a general waste bin. Empty contents into the collection truck. Check for contamination before disposal. Ensure lid is secure after emptying."
+        response: "Document with photos from multiple angles. Note surface type (brick, metal, concrete). For offensive content, prioritize for immediate removal. Use appropriate cleaning method based on surface and paint type."
       },
       {
         id: "location",
-        label: "Collection schedule",
-        response: "General waste bins are collected on Tuesdays and Fridays. Collection time: 6:00 AM - 2:00 PM. Ensure bins are placed at the curb by 6:00 AM on collection day."
+        label: "Report & document",
+        response: "Mark GPS location in app. Take photos including context shots. Note property type (public/private). Complete incident report. Estimate size in square meters. Check for gang tags or hate symbols."
       },
       {
         id: "safety",
-        label: "Safety info",
-        response: "Always wear gloves when handling waste bins. Watch for sharp objects. If you notice hazardous materials, do not empty the bin and report to supervisor immediately."
+        label: "Removal methods",
+        response: "Brick/concrete: Use graffiti remover and pressure washer. Metal: Solvent-based cleaner. Painted surfaces: May require repainting. Always wear protective gear and ensure proper ventilation."
       },
       {
-        id: "damaged",
-        label: "Damaged bin",
-        response: "For damaged bins: Tag the bin with a repair notice. Take a photo for records. Schedule replacement through the depot. Leave a collection notice for the resident."
+        id: "priority",
+        label: "Priority levels",
+        response: "Priority 1 (24hrs): Offensive/hate symbols, schools, main roads. Priority 2 (48hrs): Commercial areas, parks. Priority 3 (7 days): Low-visibility areas. Document all with before/after photos."
       }
     ],
     responses: {
-      "full": "If bin is overfilled, leave a notice for the resident. Do not force lid closed. Report persistent issues to route supervisor.",
-      "contamination": "Common contaminants: batteries, electronics, liquids. Leave educational tag on bin. Take photo for records if severe.",
-      "repairs": "Minor repairs can be done on-site. For major damage, schedule replacement. Always document with photos."
+      "repeat": "Repeat offense location: Install CCTV if budget allows. Increase patrol frequency. Apply anti-graffiti coating after removal. Notify local police.",
+      "private": "Private property: Leave notice for owner with removal instructions. Offer council assistance program details. Follow up in 14 days if not removed.",
+      "heritage": "Heritage/listed building: Do not clean. Contact heritage officer immediately. Specialized restoration may be required. Document thoroughly."
     }
   },
   "syringe": {
