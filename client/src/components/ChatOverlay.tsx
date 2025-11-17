@@ -24,11 +24,12 @@ export default function ChatOverlay({
 }: ChatOverlayProps) {
   return (
     <div
-      className="fixed bottom-4 left-4 right-4 max-w-md mx-auto z-30 animate-in slide-in-from-bottom duration-300"
+      className="fixed bottom-0 left-0 right-0 z-30 animate-in slide-in-from-bottom duration-300"
+      style={{ height: "33vh", maxHeight: "33vh" }}
       data-testid="container-chat-overlay"
     >
-      <div className="space-y-3">
-        <div className="flex items-center justify-end px-2">
+      <div className="h-full flex flex-col px-4 pb-4 pt-2">
+        <div className="flex items-center justify-end mb-2">
           <Button
             size="icon"
             variant="ghost"
@@ -41,8 +42,8 @@ export default function ChatOverlay({
           </Button>
         </div>
 
-        <ScrollArea className="max-h-[50vh]">
-          <div className="space-y-2 px-2">
+        <ScrollArea className="flex-1 mb-3">
+          <div className="space-y-2 pr-2">
             {messages.map((message) => (
               <MessageBubble
                 key={message.id}
@@ -54,7 +55,7 @@ export default function ChatOverlay({
           </div>
         </ScrollArea>
 
-        <div className="px-2">
+        <div className="flex-shrink-0">
           <QuickActionChips
             actions={quickActions}
             onActionClick={onActionClick}
