@@ -24,7 +24,7 @@ export default function ChatOverlay({
 }: ChatOverlayProps) {
   return (
     <div
-      className="fixed top-32 left-4 right-4 max-w-md mx-auto z-30 animate-in slide-in-from-top duration-300"
+      className="fixed bottom-4 left-4 right-4 max-w-md mx-auto z-30 animate-in slide-in-from-bottom duration-300"
       data-testid="container-chat-overlay"
     >
       <div className="space-y-3">
