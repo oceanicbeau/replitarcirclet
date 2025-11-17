@@ -31,9 +31,10 @@ export default function ChatOverlay({
       <div 
         className="h-full rounded-3xl flex flex-col p-4"
         style={{
-          background: "#1E88E5",
+          background: "rgba(30, 136, 229, 0.1)",
           border: "1px solid white",
-          boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)"
+          boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
+          backdropFilter: "blur(20px)"
         }}
       >
         <div className="flex items-center justify-between mb-3">
