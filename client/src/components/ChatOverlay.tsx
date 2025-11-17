@@ -31,22 +31,26 @@ export default function ChatOverlay({
         isExpanded ? "h-[60vh]" : "h-24"
       }`}
       style={{
-        backdropFilter: "blur(20px)",
-        backgroundColor: "rgba(var(--card) / 0.95)",
+        backdropFilter: "blur(16px)",
+        backgroundColor: "rgba(0, 0, 0, 0.3)",
       }}
       data-testid="container-chat-overlay"
     >
-      <div className="absolute inset-x-0 top-0 h-12 flex items-center justify-between px-4 border-b border-border">
+      <div 
+        className="absolute inset-x-0 top-0 h-12 flex items-center justify-between px-4 border-b"
+        style={{ borderColor: "rgba(255, 255, 255, 0.2)" }}
+      >
         <Button
           size="icon"
           variant="ghost"
           onClick={() => setIsExpanded(!isExpanded)}
+          className="text-white hover:bg-white/20"
           data-testid="button-toggle-expand"
         >
           {isExpanded ? <ChevronDown className="w-5 h-5" /> : <ChevronUp className="w-5 h-5" />}
         </Button>
 
-        <span className="font-semibold text-foreground" data-testid="text-chat-title">
+        <span className="font-semibold text-white" data-testid="text-chat-title">
           {objectName} Information
         </span>
 
@@ -54,6 +58,7 @@ export default function ChatOverlay({
           size="icon"
           variant="ghost"
           onClick={onClose}
+          className="text-white hover:bg-white/20"
           data-testid="button-close-chat"
         >
           <X className="w-5 h-5" />
@@ -75,7 +80,13 @@ export default function ChatOverlay({
             </div>
           </ScrollArea>
 
-          <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-border bg-background/50">
+          <div 
+            className="absolute bottom-0 left-0 right-0 p-4 border-t"
+            style={{ 
+              borderColor: "rgba(255, 255, 255, 0.2)",
+              backgroundColor: "rgba(0, 0, 0, 0.2)"
+            }}
+          >
             <QuickActionChips
               actions={quickActions}
               onActionClick={onActionClick}

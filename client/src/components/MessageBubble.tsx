@@ -27,14 +27,15 @@ export default function MessageBubble({ role, content, accentColor }: MessageBub
       )}
 
       <div
-        className={`rounded-2xl px-4 py-3 max-w-[85%] ${
-          isBot
-            ? "bg-card text-card-foreground"
-            : "bg-primary text-primary-foreground"
-        }`}
+        className="rounded-2xl px-4 py-3 max-w-[85%]"
+        style={{
+          backgroundColor: isBot ? "rgba(255, 255, 255, 0.9)" : accentColor || "rgba(255, 255, 255, 0.85)",
+          color: isBot ? "#000" : "#fff",
+          backdropFilter: "blur(8px)"
+        }}
         data-testid={`bubble-${role}`}
       >
-        <p className="text-sm leading-relaxed" data-testid="text-message-content">{content}</p>
+        <p className="text-sm leading-relaxed font-medium" data-testid="text-message-content">{content}</p>
       </div>
     </div>
   );
