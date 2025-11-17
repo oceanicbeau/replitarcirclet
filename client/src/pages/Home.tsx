@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { QrCode, Syringe, Dog } from "lucide-react";
+import { QrCode, Syringe, Dog, SprayCan } from "lucide-react";
 import QRScanner from "@/components/QRScanner";
 import CameraView from "@/components/CameraView";
 import ObjectIndicator from "@/components/ObjectIndicator";
@@ -175,7 +175,7 @@ export default function Home() {
             >
               <div className="flex justify-center mb-4">
                 <div className="w-20 h-20 rounded-full border-4 flex items-center justify-center" style={{ borderColor: "#1E88E5" }}>
-                  <div className="text-3xl">🎨</div>
+                  <SprayCan className="w-10 h-10" style={{ color: "#1E88E5" }} />
                 </div>
               </div>
               <div className="font-bold text-lg mb-2" style={{ color: "#1E88E5" }}>Graffiti</div>
