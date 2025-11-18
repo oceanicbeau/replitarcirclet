@@ -80,14 +80,34 @@ export default function Home() {
       setDetectedObject(object);
       setShowScanner(false);
       setShowCamera(true);
-      setMessages([
+      
+      const initialMessages = [
         {
           id: "1",
-          role: "bot",
+          role: "bot" as const,
           content: object.greeting,
           timestamp: new Date()
         }
-      ]);
+      ];
+      
+      if (object.type === "circle-t-logo") {
+        initialMessages.push(
+          {
+            id: "2",
+            role: "bot" as const,
+            content: "Visit Circle T at www.circlet.com.au",
+            timestamp: new Date()
+          },
+          {
+            id: "3",
+            role: "bot" as const,
+            content: "We deliver business outcomes to digitally transform the global workplace.",
+            timestamp: new Date()
+          }
+        );
+      }
+      
+      setMessages(initialMessages);
     } else {
       console.error("Unknown object QR code");
     }
@@ -124,14 +144,34 @@ export default function Home() {
     if (object) {
       setDetectedObject(object);
       setShowCamera(true);
-      setMessages([
+      
+      const initialMessages = [
         {
           id: "1",
-          role: "bot",
+          role: "bot" as const,
           content: object.greeting,
           timestamp: new Date()
         }
-      ]);
+      ];
+      
+      if (object.type === "circle-t-logo") {
+        initialMessages.push(
+          {
+            id: "2",
+            role: "bot" as const,
+            content: "Visit Circle T at www.circlet.com.au",
+            timestamp: new Date()
+          },
+          {
+            id: "3",
+            role: "bot" as const,
+            content: "We deliver business outcomes to digitally transform the global workplace.",
+            timestamp: new Date()
+          }
+        );
+      }
+      
+      setMessages(initialMessages);
     }
   };
 
@@ -165,15 +205,34 @@ export default function Home() {
     
     if (object) {
       setDetectedObject(object);
-      // Camera stays open but now shows chat overlay
-      setMessages([
+      
+      const initialMessages = [
         {
           id: "1",
-          role: "bot",
+          role: "bot" as const,
           content: object.greeting,
           timestamp: new Date()
         }
-      ]);
+      ];
+      
+      if (object.type === "circle-t-logo") {
+        initialMessages.push(
+          {
+            id: "2",
+            role: "bot" as const,
+            content: "Visit Circle T at www.circlet.com.au",
+            timestamp: new Date()
+          },
+          {
+            id: "3",
+            role: "bot" as const,
+            content: "We deliver business outcomes to digitally transform the global workplace.",
+            timestamp: new Date()
+          }
+        );
+      }
+      
+      setMessages(initialMessages);
     }
   };
 
