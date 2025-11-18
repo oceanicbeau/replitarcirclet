@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { QrCode, Syringe, Dog, SprayCan } from "lucide-react";
+import { Link } from "wouter";
 import QRScanner from "@/components/QRScanner";
 import CameraView, { CameraViewRef } from "@/components/CameraView";
 import ObjectIndicator from "@/components/ObjectIndicator";
@@ -215,9 +216,18 @@ export default function Home() {
             border: "1px solid white"
           }}
         >
-          <p className="text-sm text-white" data-testid="text-instructions">
+          <p className="text-sm text-white mb-4" data-testid="text-instructions">
             For full QR demo: Print codes with text "graffiti", "syringe", or "dog-poop"
           </p>
+          <Link href="/admin">
+            <Button
+              className="bg-white hover:bg-gray-100 font-semibold rounded-xl"
+              style={{ color: "#1E88E5" }}
+              data-testid="button-admin"
+            >
+              View Admin Dashboard
+            </Button>
+          </Link>
         </div>
       </div>
     </div>

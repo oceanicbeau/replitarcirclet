@@ -1,5 +1,8 @@
-import { type User, type InsertUser } from "@shared/schema";
+import { type User, type InsertUser, type Incident, type InsertIncident } from "@shared/schema";
 import { randomUUID } from "crypto";
+import { db } from "./db";
+import { users, incidents } from "@shared/schema";
+import { eq, desc } from "drizzle-orm";
 
 // modify the interface with any CRUD methods
 // you might need
@@ -8,6 +11,8 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  createIncident(incident: InsertIncident): Promise<Incident>;
+  getAllIncidents(): Promise<Incident[]>;
 }
 
 export class MemStorage implements IStorage {
@@ -33,6 +38,40 @@ export class MemStorage implements IStorage {
     this.users.set(id, user);
     return user;
   }
+
+  async createIncident(incident: InsertIncident): Promise<Incident> {
+    throw new Error("Database storage required for incidents");
+  }
+
+  async getAllIncidents(): Promise<Incident[]> {
+    throw new Error("Database storage required for incidents");
+  }
 }
 
-export const storage = new MemStorage();
+export class DbStorage implements IStorage {
+  async getUser(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id)).limit(1);
+    return user;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username)).limit(1);
+    return user;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db.insert(users).values(insertUser).returning();
+    return user;
+  }
+
+  async createIncident(incident: InsertIncident): Promise<Incident> {
+    const [newIncident] = await db.insert(incidents).values(incident).returning();
+    return newIncident;
+  }
+
+  async getAllIncidents(): Promise<Incident[]> {
+    return await db.select().from(incidents).orderBy(desc(incidents.createdAt));
+  }
+}
+
+export const storage = new DbStorage();

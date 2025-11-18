@@ -1,0 +1,184 @@
+import { useQuery } from "@tanstack/react-query";
+import { Incident } from "@shared/schema";
+import { ArrowLeft, MapPin, Clock, Camera, FileText, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
+
+export default function Admin() {
+  const { data: incidents, isLoading } = useQuery<Incident[]>({
+    queryKey: ["/api/incidents"],
+  });
+
+  const formatDate = (dateString: Date) => {
+    return new Date(dateString).toLocaleString();
+  };
+
+  const getPriorityBadge = (priority: string | null) => {
+    if (!priority) return null;
+    
+    const priorityConfig: Record<string, { label: string; color: string }> = {
+      priority1: { label: "Priority 1 (24hrs)", color: "#dc2626" },
+      priority2: { label: "Priority 2 (48hrs)", color: "#ea580c" },
+      priority3: { label: "Priority 3 (7 days)", color: "#ca8a04" },
+    };
+
+    const config = priorityConfig[priority] || { label: priority, color: "#1E88E5" };
+
+    return (
+      <span
+        className="px-3 py-1 rounded-full text-xs font-semibold text-white"
+        style={{ backgroundColor: config.color }}
+        data-testid={`badge-${priority}`}
+      >
+        {config.label}
+      </span>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-4 sm:p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div 
+          className="rounded-3xl p-6 mb-6"
+          style={{
+            background: "#1E88E5",
+            backdropFilter: "blur(20px)",
+            border: "1px solid white",
+            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)"
+          }}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Link href="/">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="text-white hover:bg-white/20"
+                  data-testid="button-back-home"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </Button>
+              </Link>
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-bold text-white" data-testid="text-admin-title">
+                  Admin Dashboard
+                </h1>
+                <p className="text-white/90 mt-1">Incident Reports</p>
+              </div>
+            </div>
+            {incidents && (
+              <div className="text-white text-right">
+                <div className="text-3xl font-bold" data-testid="text-incident-count">
+                  {incidents.length}
+                </div>
+                <div className="text-sm text-white/90">Total Incidents</div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Loading State */}
+        {isLoading && (
+          <div className="text-center py-12">
+            <div className="text-white text-lg">Loading incidents...</div>
+          </div>
+        )}
+
+        {/* Incidents List */}
+        {!isLoading && incidents && incidents.length === 0 && (
+          <div 
+            className="rounded-3xl p-12 text-center"
+            style={{
+              background: "#1E88E5",
+              backdropFilter: "blur(20px)",
+              border: "1px solid white",
+              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)"
+            }}
+          >
+            <AlertCircle className="w-16 h-16 text-white mx-auto mb-4" />
+            <h2 className="text-xl font-bold text-white mb-2">No Incidents Yet</h2>
+            <p className="text-white/90">Submit your first incident report to see it here.</p>
+          </div>
+        )}
+
+        {!isLoading && incidents && incidents.length > 0 && (
+          <div className="grid gap-4">
+            {incidents.map((incident) => (
+              <div
+                key={incident.id}
+                className="rounded-3xl p-6 bg-white"
+                style={{
+                  border: "1px solid #e0e0e0",
+                  boxShadow: "0 4px 16px rgba(0, 0, 0, 0.1)"
+                }}
+                data-testid={`incident-card-${incident.id}`}
+              >
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* Photo Section */}
+                  {incident.photoUrl && (
+                    <div className="lg:col-span-1">
+                      <img
+                        src={incident.photoUrl}
+                        alt="Incident"
+                        className="w-full h-48 object-cover rounded-xl"
+                        data-testid={`incident-photo-${incident.id}`}
+                      />
+                    </div>
+                  )}
+
+                  {/* Details Section */}
+                  <div className={incident.photoUrl ? "lg:col-span-2" : "lg:col-span-3"}>
+                    <div className="flex items-start justify-between mb-4">
+                      <div>
+                        <h3 className="text-xl font-bold mb-2" style={{ color: "#1E88E5" }} data-testid={`incident-type-${incident.id}`}>
+                          {incident.objectType}
+                        </h3>
+                        {incident.priority && getPriorityBadge(incident.priority)}
+                      </div>
+                      <div className="text-right text-sm text-gray-500">
+                        <div className="flex items-center gap-2 justify-end">
+                          <Clock className="w-4 h-4" />
+                          <span data-testid={`incident-date-${incident.id}`}>
+                            {formatDate(incident.timestamp)}
+                          </span>
+                        </div>
+                        <div className="text-xs text-gray-400 mt-1">
+                          ID: {incident.id}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {/* Location */}
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <MapPin className="w-4 h-4" style={{ color: "#1E88E5" }} />
+                          <span className="font-semibold text-gray-700">Location</span>
+                        </div>
+                        <p className="text-gray-900 ml-6" data-testid={`incident-location-${incident.id}`}>
+                          {incident.locationName}
+                        </p>
+                      </div>
+
+                      {/* GPS Coordinates */}
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <MapPin className="w-4 h-4" style={{ color: "#1E88E5" }} />
+                          <span className="font-semibold text-gray-700">GPS</span>
+                        </div>
+                        <p className="text-gray-900 font-mono text-sm ml-6" data-testid={`incident-gps-${incident.id}`}>
+                          {incident.gpsCoordinates}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
