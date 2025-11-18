@@ -169,14 +169,6 @@ export default function DetectionOverlay({
           ) : (
             <div className="flex items-center gap-4" data-testid="container-instructions">
               <Camera className="w-8 h-8 text-white" />
-              <div>
-                <p className="text-white font-bold text-lg">
-                  Point at Object
-                </p>
-                <p className="text-white/70 text-sm">
-                  Graffiti • Syringes • Dog Waste • Water Bottles
-                </p>
-              </div>
             </div>
           )}
         </div>
@@ -260,13 +252,7 @@ export default function DetectionOverlay({
             </div>
           ) : (
             <div data-testid="container-instructions">
-              <Camera className="w-12 h-12 text-white mx-auto mb-3" />
-              <p className="text-white font-semibold text-lg mb-2">
-                Point camera at object
-              </p>
-              <p className="text-white/70 text-sm mb-6">
-                Supports: Graffiti, Syringes, Dog Waste, Water Bottles
-              </p>
+              <Camera className="w-12 h-12 text-white mx-auto mb-6" />
               <Button
                 size="lg"
                 className="w-full"
