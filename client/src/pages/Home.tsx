@@ -216,9 +216,6 @@ export default function Home() {
             border: "1px solid white"
           }}
         >
-          <p className="text-sm text-white mb-4" data-testid="text-instructions">
-            For full QR demo: Print codes with text "graffiti", "syringe", or "dog-poop"
-          </p>
           <Link href="/admin">
             <Button
               className="bg-white hover:bg-gray-100 font-semibold rounded-xl"
