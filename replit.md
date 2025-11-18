@@ -116,15 +116,11 @@ Preferred communication style: Simple, everyday language.
 **Object Database**: Static in-memory object definitions with pre-configured responses and quick actions for each object type (graffiti, syringe, dog waste, pen).
 
 **Circle T Chatbot Integration**:
-- Circle T Smart QnA chatbot appears automatically after a 3-second confetti animation on page load
-- Confetti animation uses Circle T brand colors (#1E88E5, #4FC3F7, #81D4FA, #ffffff) and plays for exactly 3 seconds
-- After confetti completes, the chatbot appears in a full-screen iframe
+- IframeChatbot component available for full-screen overlay with close button
 - Iframe URL: https://www.circlet.com.au/showcase/Smart-QnA/?msg=tell+me+about+circle+t+solutions
-- IframeChatbot component provides full-screen overlay with close button
 - Sandbox attributes: allow-same-origin, allow-scripts, allow-forms, allow-popups, allow-popups-to-escape-sandbox
-- When Circle T logo is detected via QR code or AI detection, it now shows regular chat messages (not the iframe chatbot)
-- 30-second scanning cooldown applies after Circle T logo detection via AI
-- Cooldown is consistently enforced using shared startCooldown() function
+- When Circle T logo is detected via QR code or AI detection, it shows regular chat messages
+- Note: Circle T website blocks iframe embedding, so external chatbot may show white screen due to X-Frame-Options security policy
 
 ### Authentication and Authorization
 

@@ -14,7 +14,6 @@ import { ChatMessage, ObjectData, QuickAction } from "@shared/schema";
 import { useObjectDetection } from "@/hooks/useObjectDetection";
 import { useToast } from "@/hooks/use-toast";
 import logoUrl from "@assets/ttt_1763355102252.png";
-import confetti from "canvas-confetti";
 
 export default function Home() {
   const cameraRef = useRef<CameraViewRef>(null);
@@ -76,44 +75,6 @@ export default function Home() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [detectionMode, showCamera]); // Removed startContinuous to prevent re-runs
-
-  // Automatic confetti and Circle T chatbot on page load
-  useEffect(() => {
-    // Start confetti animation
-    const duration = 3000; // 3 seconds
-    const end = Date.now() + duration;
-    const colors = ['#1E88E5', '#4FC3F7', '#81D4FA', '#ffffff'];
-
-    (function frame() {
-      confetti({
-        particleCount: 3,
-        angle: 60,
-        spread: 55,
-        origin: { x: 0, y: 0.6 },
-        colors: colors
-      });
-      confetti({
-        particleCount: 3,
-        angle: 120,
-        spread: 55,
-        origin: { x: 1, y: 0.6 },
-        colors: colors
-      });
-
-      if (Date.now() < end) {
-        requestAnimationFrame(frame);
-      }
-    })();
-
-    // After 3 seconds, show Circle T chatbot
-    const chatbotTimer = setTimeout(() => {
-      setShowCircleTChatbot(true);
-    }, duration);
-
-    return () => {
-      clearTimeout(chatbotTimer);
-    };
-  }, []); // Run only once on mount
 
   const handleScan = (qrCode: string) => {
     console.log("QR Code scanned:", qrCode);
