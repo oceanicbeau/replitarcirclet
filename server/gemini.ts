@@ -24,26 +24,34 @@ export interface DetectionResult {
 
 export async function detectObject(imageBase64: string): Promise<DetectionResult> {
   try {
-    const prompt = `Analyze this image and determine if it contains any of the following municipal objects:
+    const prompt = `Analyze this image carefully.
+
+PRIMARY TASK: Check if it contains any of these municipal objects:
 1. Graffiti (spray paint, vandalism on walls/surfaces)
 2. Syringe (needle, medical waste)
 3. Dog waste (dog poop, feces)
 4. Circle T Logo (a circular logo with the letter T, blue branding, council logo)
 
+SECONDARY TASK: ALWAYS identify ALL other objects you see in the scene (bottles, cups, phones, computers, desks, walls, trees, roads, buildings, people, vehicles, signs, furniture, etc.)
+
 Respond with ONLY a JSON object in this exact format:
 {
   "objectType": "graffiti" | "syringe" | "dog-poop" | "circle-t-logo" | "unknown",
   "confidence": 0-100,
-  "explanation": "brief explanation",
+  "explanation": "brief explanation of what you see",
   "otherObjects": [
     {"name": "object name", "confidence": 0-100}
   ]
 }
 
-For "otherObjects", list ALL other significant objects you see in the image (walls, trees, roads, buildings, people, vehicles, signs, etc.) with their confidence levels. Include at least 3-5 other objects if visible.
+CRITICAL: ALWAYS populate "otherObjects" with 5-10 items you see, regardless of whether municipal objects are found or not.
 
-If the image contains multiple municipal objects, choose the most prominent one for "objectType".
-If none of the municipal objects are present, use "unknown" with low confidence.`;
+If municipal object found: Set objectType to the found object.
+If NO municipal object found: 
+  - Set objectType to "unknown"
+  - Set confidence to 95 (you're confident no municipal objects exist)
+  - In explanation, mention what you DO see (e.g., "Water bottle and desk visible, no municipal objects")
+  - MUST populate otherObjects with everything visible in scene`;
 
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
