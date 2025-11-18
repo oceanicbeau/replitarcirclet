@@ -3,10 +3,49 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertIncidentSchema } from "@shared/schema";
 import { db } from "./db";
+import rateLimit from "express-rate-limit";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Rate Limiting Configuration
+  
+  // Strict rate limit for creating incidents (prevents bot spam)
+  const createIncidentLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 10, // Limit each IP to 10 requests per window
+    message: { error: "Too many incidents created. Please try again later." },
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  });
+
+  // Moderate rate limit for deletions
+  const deleteIncidentLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 20, // Limit each IP to 20 deletions per window
+    message: { error: "Too many deletion requests. Please try again later." },
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+
+  // Lenient rate limit for reading incidents
+  const getIncidentsLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per window
+    message: { error: "Too many requests. Please try again later." },
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+
+  // Very lenient rate limit for health checks
+  const healthCheckLimiter = rateLimit({
+    windowMs: 1 * 60 * 1000, // 1 minute
+    max: 60, // Limit each IP to 60 requests per minute
+    message: { error: "Too many health check requests. Please try again later." },
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+
   // Health Check Endpoint
-  app.get("/health/db", async (req, res) => {
+  app.get("/health/db", healthCheckLimiter, async (req, res) => {
     try {
       // Attempt to query the database
       await storage.getAllIncidents();
@@ -38,7 +77,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Incident Routes
-  app.post("/api/incidents", async (req, res) => {
+  app.post("/api/incidents", createIncidentLimiter, async (req, res) => {
     try {
       const validatedData = insertIncidentSchema.parse(req.body);
       const incident = await storage.createIncident(validatedData);
@@ -62,7 +101,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/incidents", async (req, res) => {
+  app.get("/api/incidents", getIncidentsLimiter, async (req, res) => {
     try {
       const incidents = await storage.getAllIncidents();
       res.json(incidents);
@@ -84,7 +123,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/incidents/:id", async (req, res) => {
+  app.delete("/api/incidents/:id", deleteIncidentLimiter, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       if (isNaN(id)) {
