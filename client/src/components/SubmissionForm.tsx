@@ -16,6 +16,9 @@ export default function SubmissionForm({ objectData, cameraRef, onClose }: Submi
   const [gpsCoordinates, setGpsCoordinates] = useState<string>("Fetching location...");
   const [locationName, setLocationName] = useState<string>("Fetching location...");
   const [locationError, setLocationError] = useState(false);
+  const [priority, setPriority] = useState<string>("priority1");
+
+  const isGraffiti = objectData.type === "graffiti";
 
   useEffect(() => {
     // Get user's GPS coordinates
@@ -218,6 +221,32 @@ export default function SubmissionForm({ objectData, cameraRef, onClose }: Submi
               </p>
             </div>
           </div>
+
+          {/* Priority (Graffiti only) */}
+          {isGraffiti && (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <FileText className="w-5 h-5" style={{ color: "#1E88E5" }} />
+                <label className="font-semibold text-gray-700" data-testid="label-priority">
+                  Priority Level
+                </label>
+              </div>
+              <select
+                value={priority}
+                onChange={(e) => setPriority(e.target.value)}
+                className="w-full rounded-lg p-3 text-gray-900 font-medium"
+                style={{
+                  background: "#f5f5f5",
+                  border: "1px solid #e0e0e0"
+                }}
+                data-testid="select-priority"
+              >
+                <option value="priority1">Priority 1 (24hrs): Offensive/hate symbols, schools, main roads</option>
+                <option value="priority2">Priority 2 (48hrs): Commercial areas, parks</option>
+                <option value="priority3">Priority 3 (7 days): Low-visibility areas</option>
+              </select>
+            </div>
+          )}
 
           {/* Photo */}
           <div className="space-y-2">
