@@ -223,20 +223,10 @@ export default function Home() {
           <h2 className="text-xl font-bold text-white mb-4 text-center">
             Start Detection
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="flex justify-center">
             <Button
               size="lg"
-              className="bg-white hover:bg-gray-100 font-semibold rounded-xl py-8"
-              style={{ color: "#1E88E5" }}
-              onClick={() => setShowScanner(true)}
-              data-testid="button-scan-qr"
-            >
-              <QrCode className="w-6 h-6 mr-2" />
-              Scan QR Code
-            </Button>
-            <Button
-              size="lg"
-              className="bg-white hover:bg-gray-100 font-semibold rounded-xl py-8"
+              className="bg-white hover:bg-gray-100 font-semibold rounded-xl py-8 w-full sm:w-auto sm:min-w-[300px]"
               style={{ color: "#1E88E5" }}
               onClick={handleStartDetection}
               data-testid="button-detect-object"
