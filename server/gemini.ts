@@ -11,7 +11,7 @@ const ai = new GoogleGenAI({
 });
 
 export interface DetectionResult {
-  objectType: "graffiti" | "syringe" | "dog-poop" | "unknown";
+  objectType: "graffiti" | "syringe" | "dog-poop" | "circle-t-logo" | "unknown";
   confidence: number;
   explanation: string;
 }
@@ -22,10 +22,11 @@ export async function detectObject(imageBase64: string): Promise<DetectionResult
 1. Graffiti (spray paint, vandalism on walls/surfaces)
 2. Syringe (needle, medical waste)
 3. Dog waste (dog poop, feces)
+4. Circle T Logo (a circular logo with the letter T, blue branding, council logo)
 
 Respond with ONLY a JSON object in this exact format:
 {
-  "objectType": "graffiti" | "syringe" | "dog-poop" | "unknown",
+  "objectType": "graffiti" | "syringe" | "dog-poop" | "circle-t-logo" | "unknown",
   "confidence": 0-100,
   "explanation": "brief explanation"
 }

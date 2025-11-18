@@ -102,6 +102,29 @@ export const OBJECT_DATABASE: Record<string, ObjectData> = {
       "complaint": "Resident complaint: Document location and frequency. Issue warning notice to property owner. Schedule follow-up inspection in 7 days.",
       "education": "Leave educational flyer about responsible pet ownership. Include information about free bag dispensers. List nearby designated dog waste bins."
     }
+  },
+  "circle-t-logo": {
+    type: "circle-t-logo",
+    name: "Circle T Logo",
+    icon: "🎉",
+    accentColor: "hsl(200, 80%, 45%)",
+    greeting: "🎉 Circle T Logo detected! You found the easter egg!",
+    quickActions: [
+      {
+        id: "celebrate",
+        label: "What is this?",
+        response: "You've discovered a special easter egg! The Circle T logo represents the Council's commitment to innovation and technology. Thanks for testing the AR detection system!"
+      },
+      {
+        id: "info",
+        label: "About the app",
+        response: "This AR Assistant uses advanced AI to help council workers identify and handle waste bins, syringes, dog waste, and graffiti. Point your camera at different objects to try it out!"
+      }
+    ],
+    responses: {
+      "celebration": "Confetti time! 🎊 Keep exploring the app to discover more features.",
+      "team": "Built with innovation and care by the Circle T team. Happy detecting!"
+    }
   }
 };
 

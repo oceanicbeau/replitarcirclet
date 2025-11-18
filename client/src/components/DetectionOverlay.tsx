@@ -2,6 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Camera, X, Loader2, Check, ScanLine } from "lucide-react";
 import { DetectionResult } from "@/hooks/useObjectDetection";
 import syringeImage from "@assets/Syringe.H03.2k_1763447760772.png";
+import confetti from "canvas-confetti";
+import { useEffect } from "react";
 
 interface DetectionOverlayProps {
   isDetecting: boolean;
@@ -29,9 +31,42 @@ export default function DetectionOverlay({
       case "graffiti": return "Graffiti";
       case "syringe": return "Syringe";
       case "dog-poop": return "Dog Waste";
+      case "circle-t-logo": return "Circle T Logo";
       default: return "Unknown";
     }
   };
+
+  // Trigger confetti when Circle T logo is detected
+  useEffect(() => {
+    if (lastResult && lastResult.objectType === "circle-t-logo" && showConfirmation) {
+      // Multi-burst confetti celebration!
+      const duration = 3000;
+      const end = Date.now() + duration;
+
+      const colors = ['#1E88E5', '#4FC3F7', '#81D4FA', '#ffffff'];
+
+      (function frame() {
+        confetti({
+          particleCount: 3,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0, y: 0.6 },
+          colors: colors
+        });
+        confetti({
+          particleCount: 3,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1, y: 0.6 },
+          colors: colors
+        });
+
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      }());
+    }
+  }, [lastResult, showConfirmation]);
 
   if (continuousMode) {
     // Continuous Real-time Detection Mode
@@ -99,9 +134,12 @@ export default function DetectionOverlay({
               className="rounded-3xl p-8 text-center max-w-sm mx-4 relative z-10 pointer-events-auto"
               style={{
                 backdropFilter: "blur(20px)",
-                backgroundColor: lastResult.objectType === "syringe" 
-                  ? "rgba(239, 68, 68, 0.9)"  // Red for syringe
-                  : "rgba(30, 136, 229, 0.9)", // Blue for others
+                backgroundColor: 
+                  lastResult.objectType === "syringe" 
+                    ? "rgba(239, 68, 68, 0.9)"  // Red for syringe
+                    : lastResult.objectType === "circle-t-logo"
+                    ? "rgba(30, 136, 229, 0.95)" // Brighter blue for Circle T
+                    : "rgba(30, 136, 229, 0.9)", // Blue for others
                 border: "2px solid white",
                 boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)"
               }}
