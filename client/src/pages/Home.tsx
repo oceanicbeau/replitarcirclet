@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { QrCode, Syringe, Dog, SprayCan } from "lucide-react";
 import QRScanner from "@/components/QRScanner";
-import CameraView from "@/components/CameraView";
+import CameraView, { CameraViewRef } from "@/components/CameraView";
 import ObjectIndicator from "@/components/ObjectIndicator";
 import ChatOverlay from "@/components/ChatOverlay";
 import SubmissionForm from "@/components/SubmissionForm";
@@ -11,11 +11,13 @@ import { ChatMessage, ObjectData, QuickAction } from "@shared/schema";
 import logoUrl from "@assets/ttt_1763355102252.png";
 
 export default function Home() {
+  const cameraRef = useRef<CameraViewRef>(null);
   const [showScanner, setShowScanner] = useState(false);
   const [detectedObject, setDetectedObject] = useState<ObjectData | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [showCamera, setShowCamera] = useState(false);
   const [showSubmissionForm, setShowSubmissionForm] = useState(false);
+  const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
 
   const handleScan = (qrCode: string) => {
     console.log("QR Code scanned:", qrCode);
@@ -43,6 +45,11 @@ export default function Home() {
     
     // Check if this is a report action
     if (action.label.toLowerCase().includes("report")) {
+      // Capture photo from camera
+      if (cameraRef.current) {
+        const photo = cameraRef.current.capturePhoto();
+        setCapturedPhoto(photo);
+      }
       setShowSubmissionForm(true);
       return;
     }
@@ -56,6 +63,11 @@ export default function Home() {
         timestamp: new Date()
       }
     ]);
+  };
+
+  const handleFormClose = () => {
+    setShowSubmissionForm(false);
+    setCapturedPhoto(null); // Clear the photo when form closes
   };
 
   const handleCloseChat = () => {
@@ -86,7 +98,7 @@ export default function Home() {
 
   if (detectedObject && showCamera) {
     return (
-      <CameraView showCamera={true}>
+      <CameraView ref={cameraRef} showCamera={true}>
         <ObjectIndicator
           objectName={detectedObject.name}
           icon={detectedObject.icon}
@@ -103,7 +115,8 @@ export default function Home() {
         {showSubmissionForm && (
           <SubmissionForm
             objectData={detectedObject}
-            onClose={() => setShowSubmissionForm(false)}
+            capturedPhoto={capturedPhoto}
+            onClose={handleFormClose}
           />
         )}
       </CameraView>

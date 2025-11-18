@@ -5,17 +5,18 @@ import { ObjectData } from "@shared/schema";
 
 interface SubmissionFormProps {
   objectData: ObjectData;
+  capturedPhoto: string | null;
   onClose: () => void;
 }
 
-export default function SubmissionForm({ objectData, onClose }: SubmissionFormProps) {
+export default function SubmissionForm({ objectData, capturedPhoto, onClose }: SubmissionFormProps) {
   const [submitted, setSubmitted] = useState(false);
 
   const mockData = {
     address: "Garden City Playground",
     gpsCoordinates: "40.7128° N, 74.0060° W",
     timestamp: new Date().toLocaleString(),
-    photoUrl: "https://via.placeholder.com/400x300/1E88E5/FFFFFF?text=Object+Photo"
+    photoUrl: capturedPhoto || "https://via.placeholder.com/400x300/1E88E5/FFFFFF?text=Object+Photo"
   };
 
   const handleSubmit = () => {

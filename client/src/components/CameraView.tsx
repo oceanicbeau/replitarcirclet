@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useImperativeHandle, forwardRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Camera, Info } from "lucide-react";
 
@@ -7,10 +7,31 @@ interface CameraViewProps {
   children?: React.ReactNode;
 }
 
-export default function CameraView({ showCamera, children }: CameraViewProps) {
+export interface CameraViewRef {
+  capturePhoto: () => string | null;
+}
+
+const CameraView = forwardRef<CameraViewRef, CameraViewProps>(({ showCamera, children }, ref) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  useImperativeHandle(ref, () => ({
+    capturePhoto: () => {
+      if (!videoRef.current) return null;
+      
+      const video = videoRef.current;
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return null;
+      
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      return canvas.toDataURL('image/jpeg', 0.8);
+    }
+  }));
 
   useEffect(() => {
     if (showCamera) {
@@ -79,4 +100,8 @@ export default function CameraView({ showCamera, children }: CameraViewProps) {
       {children}
     </div>
   );
-}
+});
+
+CameraView.displayName = 'CameraView';
+
+export default CameraView;
