@@ -161,14 +161,6 @@ export default function DetectionOverlay({
                 Select
               </Button>
             </div>
-          ) : lastResult && lastResult.objectType === "unknown" && !isDetecting ? (
-            <p className="text-yellow-300 text-sm" data-testid="text-unknown-object">
-              Unknown object - move camera to try again
-            </p>
-          ) : lastResult && lastResult.objectType !== "unknown" && lastResult.confidence < 60 && !isDetecting ? (
-            <p className="text-yellow-300 text-sm" data-testid="text-low-confidence">
-              Low confidence - move closer or try different angle
-            </p>
           ) : (
             <div className="flex items-center gap-4" data-testid="container-instructions">
               <Camera className="w-8 h-8 text-white" />
@@ -266,29 +258,6 @@ export default function DetectionOverlay({
                 <Camera className="w-5 h-5 mr-2" />
                 Capture & Detect
               </Button>
-            </div>
-          )}
-
-          {/* Show last result if detection failed or low confidence */}
-          {lastResult && lastResult.objectType === "unknown" && !isDetecting && (
-            <div className="mt-4 p-3 rounded-lg bg-red-500/20 border border-red-500/30" data-testid="container-error">
-              <p className="text-red-200 text-sm">
-                Could not detect a known object
-              </p>
-              <p className="text-red-200/70 text-xs mt-1">
-                {lastResult.explanation}
-              </p>
-            </div>
-          )}
-          
-          {lastResult && lastResult.objectType !== "unknown" && lastResult.confidence < 60 && !isDetecting && (
-            <div className="mt-4 p-3 rounded-lg bg-yellow-500/20 border border-yellow-500/30" data-testid="container-low-confidence">
-              <p className="text-yellow-200 text-sm">
-                Low confidence detection ({lastResult.confidence}%)
-              </p>
-              <p className="text-yellow-200/70 text-xs mt-1">
-                Try capturing again for better results
-              </p>
             </div>
           )}
         </div>
