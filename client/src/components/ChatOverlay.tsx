@@ -12,6 +12,7 @@ interface ChatOverlayProps {
   quickActions: QuickAction[];
   onActionClick: (action: QuickAction) => void;
   onClose: () => void;
+  isCircleT?: boolean;
 }
 
 export default function ChatOverlay({
@@ -21,11 +22,16 @@ export default function ChatOverlay({
   quickActions,
   onActionClick,
   onClose,
+  isCircleT = false,
 }: ChatOverlayProps) {
   // Find the report action
   const reportAction = quickActions.find(action => action.label.toLowerCase().includes('report'));
   // Filter out report actions from the quick actions chips
   const nonReportActions = quickActions.filter(action => !action.label.toLowerCase().includes('report'));
+  
+  const handleCircleTClick = () => {
+    window.open('https://www.circlet.com.au/showcase/Smart-QnA/', '_blank');
+  };
 
   return (
     <div
@@ -45,8 +51,21 @@ export default function ChatOverlay({
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-white font-bold text-lg">{objectName}</h3>
           
-          {/* Report Button */}
-          {reportAction && (
+          {/* Circle T Smart Assistant Button */}
+          {isCircleT ? (
+            <Button
+              onClick={handleCircleTClick}
+              className="rounded-full px-6 py-2 font-medium text-sm transition-all hover:scale-105 active:scale-95"
+              style={{
+                background: "#1E88E5",
+                border: "2px solid white",
+                color: "white"
+              }}
+              data-testid="button-circle-t-chatbot"
+            >
+              Chat with Circle T Smart Assistant
+            </Button>
+          ) : reportAction && (
             <Button
               onClick={() => onActionClick(reportAction)}
               className="rounded-full px-6 py-2 font-medium text-sm transition-all hover:scale-105 active:scale-95"

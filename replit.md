@@ -118,13 +118,13 @@ Preferred communication style: Simple, everyday language.
 **Circle T Logo Detection**:
 - When Circle T logo is detected via AI detection:
   - Confetti animation plays for 3 seconds using Circle T brand colors (#1E88E5, #4FC3F7, #81D4FA, #ffffff)
-  - After confetti completes, shows regular chat messages
-  - Messages include a clickable link to the Circle T Smart Assistant chatbot
-  - Link: https://www.circlet.com.au/showcase/Smart-QnA/
+  - Detection UI remains visible (user must click "Select" button to proceed)
+  - After clicking "Select", shows chat messages with "Chat with Circle T Smart Assistant" button
+  - Button opens https://www.circlet.com.au/showcase/Smart-QnA/ in new browser tab
 - When Circle T logo is detected via QR code:
-  - Shows regular chat messages immediately (no confetti)
-  - Includes the same clickable link to Circle T chatbot
-- Users can tap the link to open the Circle T chatbot in a new browser tab
+  - Shows chat messages with "Chat with Circle T Smart Assistant" button (no confetti)
+- Object label displays as "Circle T" (without "Logo" suffix)
+- Chat header shows "Circle T" instead of "Circle T Logo"
 
 ### Authentication and Authorization
 

@@ -318,6 +318,7 @@ export default function Home() {
           quickActions={detectedObject.quickActions}
           onActionClick={handleActionClick}
           onClose={handleCloseChat}
+          isCircleT={detectedObject.type === "circle-t-logo"}
         />
         {showSubmissionForm && (
           <SubmissionForm

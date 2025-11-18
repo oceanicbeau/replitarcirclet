@@ -3,7 +3,7 @@ import { Camera, X, Loader2, Check, ScanLine } from "lucide-react";
 import { DetectionResult } from "@/hooks/useObjectDetection";
 import syringeImage from "@assets/Syringe.H03.2k_1763447760772.png";
 import confetti from "canvas-confetti";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 interface DetectionOverlayProps {
   isDetecting: boolean;
@@ -25,7 +25,6 @@ export default function DetectionOverlay({
   isActive = false
 }: DetectionOverlayProps) {
   const showConfirmation = lastResult && lastResult.objectType !== "unknown" && lastResult.confidence >= 60;
-  const [countdown, setCountdown] = useState<number | null>(null);
   
   const getObjectLabel = (objectType: string) => {
     switch(objectType) {
@@ -33,7 +32,7 @@ export default function DetectionOverlay({
       case "syringe": return "Syringe";
       case "dog-poop": return "Dog Waste";
       case "water-bottle": return "Water Bottle";
-      case "circle-t-logo": return "Circle T Logo";
+      case "circle-t-logo": return "Circle T";
       case "pen": return "Pen";
       default: return "Unknown";
     }
@@ -71,35 +70,7 @@ export default function DetectionOverlay({
     }
   }, [lastResult, showConfirmation]);
 
-  // Auto-transition for Circle T logo after 3 seconds (when confetti ends)
-  useEffect(() => {
-    if (lastResult && lastResult.objectType === "circle-t-logo" && showConfirmation && onConfirm) {
-      setCountdown(3);
-      
-      // Countdown interval
-      const countdownInterval = setInterval(() => {
-        setCountdown((prev) => {
-          if (prev === null || prev <= 1) {
-            return null;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-
-      // Auto-transition timer - open chatbot after confetti
-      const timer = setTimeout(() => {
-        onConfirm(lastResult.objectType);
-      }, 3000);
-
-      return () => {
-        clearTimeout(timer);
-        clearInterval(countdownInterval);
-        setCountdown(null);
-      };
-    } else {
-      setCountdown(null);
-    }
-  }, [lastResult, showConfirmation, onConfirm]);
+  // No auto-transition for Circle T - keep detection UI visible
 
   if (continuousMode) {
     // Continuous Real-time Detection Mode
@@ -200,9 +171,7 @@ export default function DetectionOverlay({
                 onClick={() => onConfirm && onConfirm(lastResult.objectType)}
                 data-testid="button-select-object"
               >
-                {countdown !== null && lastResult.objectType === "circle-t-logo" 
-                  ? `Select (${countdown}s)` 
-                  : "Select"}
+                Select
               </Button>
             </div>
           ) : lastResult && lastResult.objectType === "unknown" && !isDetecting ? (
