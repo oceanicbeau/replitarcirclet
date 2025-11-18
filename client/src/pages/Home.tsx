@@ -31,7 +31,7 @@ export default function Home() {
   const [showCircleTChatbot, setShowCircleTChatbot] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   
-  const { detect, isDetecting, lastResult, isActive, startContinuous, stopContinuous } = useObjectDetection({
+  const { detect, isDetecting, lastResult, isActive, startContinuous, stopContinuous, reset } = useObjectDetection({
     continuous: true,
     interval: 3000, // Detect every 3 seconds
     onError: (error) => {
@@ -294,7 +294,19 @@ export default function Home() {
 
   const handleCloseDetection = () => {
     console.log("[Home] Closing detection");
-    stopContinuous();
+    
+    // Clear pause timer
+    if (pauseTimerRef.current) {
+      clearTimeout(pauseTimerRef.current);
+      pauseTimerRef.current = null;
+    }
+    
+    // Reset pause state
+    setIsPaused(false);
+    
+    // Reset detection state (clears lastResult and stops continuous detection)
+    reset();
+    
     setDetectionMode(false);
     setShowCamera(false);
   };

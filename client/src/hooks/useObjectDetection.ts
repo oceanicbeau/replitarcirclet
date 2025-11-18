@@ -171,6 +171,12 @@ export function useObjectDetection(options: UseObjectDetectionOptions = {}) {
     cancel(); // This now also resets isDetectingRef
   }, [cancel]);
 
+  const reset = useCallback(() => {
+    console.log("[Detection] Resetting detection state");
+    stopContinuous();
+    setLastResult(null);
+  }, [stopContinuous]);
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -186,5 +192,6 @@ export function useObjectDetection(options: UseObjectDetectionOptions = {}) {
     isActive,
     startContinuous,
     stopContinuous,
+    reset,
   };
 }
