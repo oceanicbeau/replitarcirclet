@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, integer } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, integer, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -38,6 +38,23 @@ export const insertIncidentSchema = createInsertSchema(incidents, {
 
 export type InsertIncident = z.infer<typeof insertIncidentSchema>;
 export type Incident = typeof incidents.$inferSelect;
+
+export const detectionEvents = pgTable("detection_events", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  objectType: text("object_type").notNull(),
+  confidence: integer("confidence").notNull(),
+  source: text("source").notNull(),
+  confirmed: integer("confirmed"),
+  timestamp: timestamp("timestamp").notNull().defaultNow(),
+});
+
+export const insertDetectionEventSchema = createInsertSchema(detectionEvents).omit({
+  id: true,
+  timestamp: true,
+});
+
+export type InsertDetectionEvent = z.infer<typeof insertDetectionEventSchema>;
+export type DetectionEvent = typeof detectionEvents.$inferSelect;
 
 export type ObjectType = "graffiti" | "syringe" | "dog-poop";
 

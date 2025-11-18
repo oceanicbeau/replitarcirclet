@@ -1,11 +1,12 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertIncidentSchema } from "@shared/schema";
+import { insertIncidentSchema, insertDetectionEventSchema } from "@shared/schema";
 import { db } from "./db";
 import rateLimit from "express-rate-limit";
 import geoip from "geoip-lite";
 import NodeCache from "node-cache";
+import { detectObject } from "./gemini";
 
 // Cache for geolocation lookups (1 hour TTL)
 const geoCache = new NodeCache({ stdTTL: 3600, checkperiod: 600 });
@@ -143,6 +144,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     legacyHeaders: false,
   });
 
+  // Moderate rate limit for object detection (AI calls are expensive)
+  const detectObjectLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 30, // Limit each IP to 30 detections per window
+    message: { error: "Too many detection requests. Please try again later." },
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+
   // Health Check Endpoint
   app.get("/health/db", healthCheckLimiter, async (req, res) => {
     try {
@@ -171,6 +181,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
         error: process.env.NODE_ENV === "development" ? errorMessage : "Database connection failed",
         stack: process.env.NODE_ENV === "development" ? errorStack : undefined,
         timestamp: new Date().toISOString()
+      });
+    }
+  });
+
+  // Object Detection Endpoint (using Gemini Vision AI)
+  app.post("/api/detect", geolocate, melbourneOnly, detectObjectLimiter, async (req, res) => {
+    try {
+      const { imageData } = req.body;
+      
+      if (!imageData || typeof imageData !== 'string') {
+        return res.status(400).json({ error: "Missing or invalid image data (base64 string required)" });
+      }
+      
+      // Remove data URL prefix if present
+      let base64Image = imageData;
+      if (imageData.startsWith('data:')) {
+        base64Image = imageData.split(',')[1];
+      }
+      
+      // Call Gemini Vision API for object detection
+      const result = await detectObject(base64Image);
+      
+      // Log detection event to database for analytics (only for known objects)
+      if (result.objectType !== 'unknown') {
+        try {
+          await storage.createDetectionEvent({
+            objectType: result.objectType,
+            confidence: Math.round(result.confidence), // Round to integer for database
+            source: 'camera',
+            confirmed: null,
+          });
+        } catch (dbError) {
+          console.warn("[Detection] Failed to log detection event:", dbError);
+          // Continue even if logging fails
+        }
+      }
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Error detecting object:", error);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      
+      // Log detailed error for debugging
+      console.error("Full detection error details:", {
+        message: errorMessage,
+        stack: errorStack
+      });
+      
+      res.status(500).json({ 
+        error: "Failed to detect object",
+        details: process.env.NODE_ENV === "development" ? errorMessage : undefined
       });
     }
   });

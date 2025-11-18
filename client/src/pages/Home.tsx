@@ -1,22 +1,39 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { QrCode, Syringe, Dog, SprayCan } from "lucide-react";
+import { QrCode, Syringe, Dog, SprayCan, Camera } from "lucide-react";
 import { Link } from "wouter";
 import QRScanner from "@/components/QRScanner";
 import CameraView, { CameraViewRef } from "@/components/CameraView";
 import ChatOverlay from "@/components/ChatOverlay";
 import SubmissionForm from "@/components/SubmissionForm";
+import DetectionOverlay from "@/components/DetectionOverlay";
 import { getObjectByQRCode } from "@/lib/objectData";
 import { ChatMessage, ObjectData, QuickAction } from "@shared/schema";
+import { useObjectDetection } from "@/hooks/useObjectDetection";
+import { useToast } from "@/hooks/use-toast";
 import logoUrl from "@assets/ttt_1763355102252.png";
 
 export default function Home() {
   const cameraRef = useRef<CameraViewRef>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const { toast } = useToast();
+  
   const [showScanner, setShowScanner] = useState(false);
   const [detectedObject, setDetectedObject] = useState<ObjectData | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [showCamera, setShowCamera] = useState(false);
   const [showSubmissionForm, setShowSubmissionForm] = useState(false);
+  const [detectionMode, setDetectionMode] = useState(false);
+  
+  const { detect, isDetecting, lastResult } = useObjectDetection({
+    onError: (error) => {
+      toast({
+        title: "Detection Failed",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  });
 
   const handleScan = (qrCode: string) => {
     console.log("QR Code scanned:", qrCode);
@@ -81,8 +98,65 @@ export default function Home() {
     }
   };
 
+  const handleStartDetection = () => {
+    setDetectionMode(true);
+    setShowCamera(true);
+  };
+
+  const handleCapture = async () => {
+    // Get video element from CameraView
+    const videoElement = document.querySelector('video') as HTMLVideoElement;
+    
+    if (!videoElement) {
+      toast({
+        title: "Error",
+        description: "Camera not ready",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    await detect(videoElement);
+  };
+
+  const handleConfirmDetection = (objectType: string) => {
+    const object = getObjectByQRCode(objectType);
+    
+    if (object) {
+      setDetectedObject(object);
+      setDetectionMode(false);
+      setMessages([
+        {
+          id: "1",
+          role: "bot",
+          content: object.greeting,
+          timestamp: new Date()
+        }
+      ]);
+    }
+  };
+
+  const handleCloseDetection = () => {
+    setDetectionMode(false);
+    setShowCamera(false);
+  };
+
   if (showScanner) {
     return <QRScanner onScan={handleScan} onClose={() => setShowScanner(false)} />;
+  }
+
+  if (detectionMode && showCamera) {
+    return (
+      <CameraView ref={cameraRef} showCamera={true}>
+        <DetectionOverlay
+          isDetecting={isDetecting}
+          lastResult={lastResult}
+          onCapture={handleCapture}
+          onClose={handleCloseDetection}
+          onConfirm={handleConfirmDetection}
+        />
+      </CameraView>
+    );
   }
 
   if (detectedObject && showCamera) {
@@ -134,6 +208,43 @@ export default function Home() {
           <p className="text-white text-lg" data-testid="text-app-description">
             Smart Object Recognition & Guidance System
           </p>
+        </div>
+
+        {/* Detection Methods */}
+        <div 
+          className="rounded-3xl p-6"
+          style={{
+            background: "#1E88E5",
+            backdropFilter: "blur(20px)",
+            border: "1px solid white",
+            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)"
+          }}
+        >
+          <h2 className="text-xl font-bold text-white mb-4 text-center">
+            Start Detection
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Button
+              size="lg"
+              className="bg-white hover:bg-gray-100 font-semibold rounded-xl py-8"
+              style={{ color: "#1E88E5" }}
+              onClick={() => setShowScanner(true)}
+              data-testid="button-scan-qr"
+            >
+              <QrCode className="w-6 h-6 mr-2" />
+              Scan QR Code
+            </Button>
+            <Button
+              size="lg"
+              className="bg-white hover:bg-gray-100 font-semibold rounded-xl py-8"
+              style={{ color: "#1E88E5" }}
+              onClick={handleStartDetection}
+              data-testid="button-detect-object"
+            >
+              <Camera className="w-6 h-6 mr-2" />
+              Detect Object (AI)
+            </Button>
+          </div>
         </div>
 
         {/* Demo Grid */}

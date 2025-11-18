@@ -1,7 +1,7 @@
-import { type User, type InsertUser, type Incident, type InsertIncident } from "@shared/schema";
+import { type User, type InsertUser, type Incident, type InsertIncident, type DetectionEvent, type InsertDetectionEvent } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { db } from "./db";
-import { users, incidents } from "@shared/schema";
+import { users, incidents, detectionEvents } from "@shared/schema";
 import { eq, desc } from "drizzle-orm";
 
 // modify the interface with any CRUD methods
@@ -14,6 +14,7 @@ export interface IStorage {
   createIncident(incident: InsertIncident): Promise<Incident>;
   getAllIncidents(): Promise<Incident[]>;
   deleteIncident(id: number): Promise<void>;
+  createDetectionEvent(event: InsertDetectionEvent): Promise<DetectionEvent>;
 }
 
 export class MemStorage implements IStorage {
@@ -51,6 +52,10 @@ export class MemStorage implements IStorage {
   async deleteIncident(id: number): Promise<void> {
     throw new Error("Database storage required for incidents");
   }
+
+  async createDetectionEvent(event: InsertDetectionEvent): Promise<DetectionEvent> {
+    throw new Error("Database storage required for detection events");
+  }
 }
 
 export class DbStorage implements IStorage {
@@ -80,6 +85,11 @@ export class DbStorage implements IStorage {
 
   async deleteIncident(id: number): Promise<void> {
     await db.delete(incidents).where(eq(incidents.id, id));
+  }
+
+  async createDetectionEvent(event: InsertDetectionEvent): Promise<DetectionEvent> {
+    const [newEvent] = await db.insert(detectionEvents).values(event).returning();
+    return newEvent;
   }
 }
 
