@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { apiRequest } from "@/lib/queryClient";
 import type { ObjectType } from "@shared/schema";
 
@@ -12,14 +12,20 @@ export interface UseObjectDetectionOptions {
   onDetection?: (result: DetectionResult) => void;
   onError?: (error: Error) => void;
   minConfidence?: number;
+  continuous?: boolean;
+  interval?: number; // milliseconds between detections
 }
 
 export function useObjectDetection(options: UseObjectDetectionOptions = {}) {
-  const { onDetection, onError, minConfidence = 60 } = options;
+  const { onDetection, onError, minConfidence = 60, continuous = false, interval = 3000 } = options;
   
   const [isDetecting, setIsDetecting] = useState(false);
   const [lastResult, setLastResult] = useState<DetectionResult | null>(null);
+  const [isActive, setIsActive] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const videoElementRef = useRef<HTMLVideoElement | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const isDetectingRef = useRef(false); // Track detection state for interval callback
 
   const captureFrame = useCallback((videoElement: HTMLVideoElement): string | null => {
     try {
@@ -63,6 +69,7 @@ export function useObjectDetection(options: UseObjectDetectionOptions = {}) {
     }
 
     setIsDetecting(true);
+    isDetectingRef.current = true;
     const abortController = new AbortController();
     abortControllerRef.current = abortController;
 
@@ -107,6 +114,7 @@ export function useObjectDetection(options: UseObjectDetectionOptions = {}) {
     } finally {
       if (!abortController.signal.aborted) {
         setIsDetecting(false);
+        isDetectingRef.current = false;
         abortControllerRef.current = null;
       }
     }
@@ -118,12 +126,59 @@ export function useObjectDetection(options: UseObjectDetectionOptions = {}) {
       abortControllerRef.current = null;
     }
     setIsDetecting(false);
+    isDetectingRef.current = false; // Reset ref to allow future detections
   }, []);
+
+  const startContinuous = useCallback((videoElement: HTMLVideoElement) => {
+    if (!continuous) return;
+    
+    // Idempotency check - prevent multiple intervals
+    if (intervalRef.current) {
+      console.log("[Detection] Already active, skipping startContinuous");
+      return;
+    }
+    
+    console.log("[Detection] Starting continuous detection");
+    videoElementRef.current = videoElement;
+    setIsActive(true);
+    
+    // Run first detection immediately
+    detect(videoElement);
+    
+    // Set up interval for continuous detection
+    intervalRef.current = setInterval(() => {
+      // Use ref to check current detection state (not stale closure)
+      if (videoElementRef.current && !isDetectingRef.current) {
+        detect(videoElementRef.current);
+      }
+    }, interval);
+  }, [continuous, interval, detect]); // Removed isDetecting from dependencies
+
+  const stopContinuous = useCallback(() => {
+    console.log("[Detection] Stopping continuous detection");
+    setIsActive(false);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    videoElementRef.current = null;
+    cancel(); // This now also resets isDetectingRef
+  }, [cancel]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      stopContinuous();
+    };
+  }, [stopContinuous]);
 
   return {
     detect,
     cancel,
     isDetecting,
     lastResult,
+    isActive,
+    startContinuous,
+    stopContinuous,
   };
 }

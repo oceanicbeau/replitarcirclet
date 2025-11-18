@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { QrCode, Syringe, Dog, SprayCan, Camera } from "lucide-react";
 import { Link } from "wouter";
@@ -25,15 +25,36 @@ export default function Home() {
   const [showSubmissionForm, setShowSubmissionForm] = useState(false);
   const [detectionMode, setDetectionMode] = useState(false);
   
-  const { detect, isDetecting, lastResult } = useObjectDetection({
+  const { detect, isDetecting, lastResult, isActive, startContinuous, stopContinuous } = useObjectDetection({
+    continuous: true,
+    interval: 3000, // Detect every 3 seconds
     onError: (error) => {
-      toast({
-        title: "Detection Failed",
-        description: error.message,
-        variant: "destructive"
-      });
+      console.error("[Home] Detection error:", error);
+      // Don't show error toast for continuous mode - errors are expected
     }
   });
+
+  // Start continuous detection when camera opens in detection mode
+  useEffect(() => {
+    if (detectionMode && showCamera) {
+      let mounted = true;
+      
+      // Wait for video element to be ready
+      const timer = setTimeout(() => {
+        const videoElement = document.querySelector('video') as HTMLVideoElement;
+        if (mounted && videoElement && videoElement.readyState >= 2) {
+          console.log("[Home] Starting continuous detection");
+          startContinuous(videoElement);
+        }
+      }, 500);
+      
+      return () => {
+        mounted = false;
+        clearTimeout(timer);
+      };
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [detectionMode, showCamera]); // Removed startContinuous to prevent re-runs
 
   const handleScan = (qrCode: string) => {
     console.log("QR Code scanned:", qrCode);
@@ -120,6 +141,9 @@ export default function Home() {
   };
 
   const handleConfirmDetection = (objectType: string) => {
+    console.log("[Home] Confirming detection:", objectType);
+    stopContinuous();
+    
     const object = getObjectByQRCode(objectType);
     
     if (object) {
@@ -137,6 +161,8 @@ export default function Home() {
   };
 
   const handleCloseDetection = () => {
+    console.log("[Home] Closing detection");
+    stopContinuous();
     setDetectionMode(false);
     setShowCamera(false);
   };
@@ -151,9 +177,10 @@ export default function Home() {
         <DetectionOverlay
           isDetecting={isDetecting}
           lastResult={lastResult}
-          onCapture={handleCapture}
           onClose={handleCloseDetection}
           onConfirm={handleConfirmDetection}
+          continuousMode={true}
+          isActive={isActive}
         />
       </CameraView>
     );
