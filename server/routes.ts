@@ -26,6 +26,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete("/api/incidents/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: "Invalid incident ID" });
+      }
+      await storage.deleteIncident(id);
+      res.status(200).json({ message: "Incident deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting incident:", error);
+      res.status(500).json({ error: "Failed to delete incident" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;

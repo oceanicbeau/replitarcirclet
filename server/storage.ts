@@ -13,6 +13,7 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   createIncident(incident: InsertIncident): Promise<Incident>;
   getAllIncidents(): Promise<Incident[]>;
+  deleteIncident(id: number): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -46,6 +47,10 @@ export class MemStorage implements IStorage {
   async getAllIncidents(): Promise<Incident[]> {
     throw new Error("Database storage required for incidents");
   }
+
+  async deleteIncident(id: number): Promise<void> {
+    throw new Error("Database storage required for incidents");
+  }
 }
 
 export class DbStorage implements IStorage {
@@ -71,6 +76,10 @@ export class DbStorage implements IStorage {
 
   async getAllIncidents(): Promise<Incident[]> {
     return await db.select().from(incidents).orderBy(desc(incidents.createdAt));
+  }
+
+  async deleteIncident(id: number): Promise<void> {
+    await db.delete(incidents).where(eq(incidents.id, id));
   }
 }
 

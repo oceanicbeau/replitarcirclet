@@ -1,13 +1,45 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Incident } from "@shared/schema";
-import { ArrowLeft, MapPin, Clock, Camera, FileText, AlertCircle } from "lucide-react";
+import { ArrowLeft, MapPin, Clock, Camera, FileText, AlertCircle, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
+import { queryClient, apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Admin() {
+  const { toast } = useToast();
+  
   const { data: incidents, isLoading } = useQuery<Incident[]>({
     queryKey: ["/api/incidents"],
   });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return await apiRequest(`/api/incidents/${id}`, {
+        method: "DELETE",
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/incidents"] });
+      toast({
+        title: "Incident Deleted",
+        description: "The incident has been removed successfully.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Delete Failed",
+        description: "Could not delete the incident. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleDelete = (id: number) => {
+    if (confirm("Are you sure you want to delete this incident?")) {
+      deleteMutation.mutate(id);
+    }
+  };
 
   const formatDate = (dateString: Date) => {
     return new Date(dateString).toLocaleString();
@@ -147,16 +179,28 @@ export default function Admin() {
                         </h3>
                         {incident.priority && getPriorityBadge(incident.priority)}
                       </div>
-                      <div className="text-right text-sm text-gray-500">
-                        <div className="flex items-center gap-2 justify-end">
-                          <Clock className="w-4 h-4" />
-                          <span data-testid={`incident-date-${incident.id}`}>
-                            {formatDate(incident.timestamp)}
-                          </span>
+                      <div className="flex items-start gap-3">
+                        <div className="text-right text-sm text-gray-500">
+                          <div className="flex items-center gap-2 justify-end">
+                            <Clock className="w-4 h-4" />
+                            <span data-testid={`incident-date-${incident.id}`}>
+                              {formatDate(incident.timestamp)}
+                            </span>
+                          </div>
+                          <div className="text-xs text-gray-400 mt-1">
+                            ID: {incident.id}
+                          </div>
                         </div>
-                        <div className="text-xs text-gray-400 mt-1">
-                          ID: {incident.id}
-                        </div>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => handleDelete(incident.id)}
+                          className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                          data-testid={`button-delete-${incident.id}`}
+                          disabled={deleteMutation.isPending}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       </div>
                     </div>
 
