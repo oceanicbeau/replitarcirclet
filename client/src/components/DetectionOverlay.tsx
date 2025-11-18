@@ -95,6 +95,24 @@ export default function DetectionOverlay({
 
         {/* Spacer to push bottom UI down */}
         <div className="flex-1 flex items-center justify-center relative">
+          {/* Photo Copier Scanning Animation - Shows during detection */}
+          {(isActive && !isPaused && !showConfirmation) && (
+            <div 
+              className="absolute inset-0 overflow-hidden pointer-events-none"
+              data-testid="overlay-scanning-animation"
+            >
+              <div 
+                className="absolute left-0 right-0 h-1"
+                style={{
+                  background: 'linear-gradient(to bottom, transparent, rgba(30, 136, 229, 0.8), rgba(30, 136, 229, 1), rgba(30, 136, 229, 0.8), transparent)',
+                  boxShadow: '0 0 20px rgba(30, 136, 229, 0.8), 0 0 40px rgba(30, 136, 229, 0.4)',
+                  height: '4px',
+                  animation: 'scanDown 3s ease-in-out infinite'
+                }}
+              />
+            </div>
+          )}
+          
           {/* 3D Syringe Model Overlay - Shows when syringe detected */}
           {lastResult && lastResult.objectType === "syringe" && showConfirmation && (
             <div 

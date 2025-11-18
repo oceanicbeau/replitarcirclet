@@ -286,3 +286,21 @@
     inset: -1px;
   }
 }
+
+/* Photo Copier Scanning Animation */
+@keyframes scanDown {
+  0% {
+    top: -4px;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
