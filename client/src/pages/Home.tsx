@@ -5,6 +5,7 @@ import QRScanner from "@/components/QRScanner";
 import CameraView from "@/components/CameraView";
 import ObjectIndicator from "@/components/ObjectIndicator";
 import ChatOverlay from "@/components/ChatOverlay";
+import SubmissionForm from "@/components/SubmissionForm";
 import { getObjectByQRCode } from "@/lib/objectData";
 import { ChatMessage, ObjectData, QuickAction } from "@shared/schema";
 import logoUrl from "@assets/ttt_1763355102252.png";
@@ -14,6 +15,7 @@ export default function Home() {
   const [detectedObject, setDetectedObject] = useState<ObjectData | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [showCamera, setShowCamera] = useState(false);
+  const [showSubmissionForm, setShowSubmissionForm] = useState(false);
 
   const handleScan = (qrCode: string) => {
     console.log("QR Code scanned:", qrCode);
@@ -38,6 +40,13 @@ export default function Home() {
 
   const handleActionClick = (action: QuickAction) => {
     console.log("Quick action clicked:", action.label);
+    
+    // Check if this is a report action
+    if (action.label.toLowerCase().includes("report")) {
+      setShowSubmissionForm(true);
+      return;
+    }
+    
     setMessages((prev) => [
       ...prev,
       {
@@ -91,6 +100,12 @@ export default function Home() {
           onActionClick={handleActionClick}
           onClose={handleCloseChat}
         />
+        {showSubmissionForm && (
+          <SubmissionForm
+            objectData={detectedObject}
+            onClose={() => setShowSubmissionForm(false)}
+          />
+        )}
       </CameraView>
     );
   }
