@@ -17,6 +17,8 @@ import logoUrl from "@assets/ttt_1763355102252.png";
 export default function Home() {
   const cameraRef = useRef<CameraViewRef>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const pauseIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const pauseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
   
   const [showScanner, setShowScanner] = useState(false);
@@ -75,6 +77,18 @@ export default function Home() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [detectionMode, showCamera]); // Removed startContinuous to prevent re-runs
+
+  // Cleanup cooldown timers on component unmount
+  useEffect(() => {
+    return () => {
+      if (pauseIntervalRef.current) {
+        clearInterval(pauseIntervalRef.current);
+      }
+      if (pauseTimeoutRef.current) {
+        clearTimeout(pauseTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleScan = (qrCode: string) => {
     console.log("QR Code scanned:", qrCode);
@@ -260,22 +274,35 @@ export default function Home() {
       
       // Apply 30-second cooldown for syringe, pen, and circle-t-logo
       if (object.type === "syringe" || object.type === "pen" || object.type === "circle-t-logo") {
+        // Clear any existing cooldown timers first
+        if (pauseIntervalRef.current) {
+          clearInterval(pauseIntervalRef.current);
+          pauseIntervalRef.current = null;
+        }
+        if (pauseTimeoutRef.current) {
+          clearTimeout(pauseTimeoutRef.current);
+          pauseTimeoutRef.current = null;
+        }
+        
         setScanningPaused(true);
         setPauseTimeRemaining(30);
         
-        const pauseInterval = setInterval(() => {
+        pauseIntervalRef.current = setInterval(() => {
           setPauseTimeRemaining((prev) => {
             if (prev === null || prev <= 1) {
-              return null;
+              return 0; // Clamp at zero
             }
             return prev - 1;
           });
         }, 1000);
         
-        setTimeout(() => {
+        pauseTimeoutRef.current = setTimeout(() => {
           setScanningPaused(false);
           setPauseTimeRemaining(null);
-          clearInterval(pauseInterval);
+          if (pauseIntervalRef.current) {
+            clearInterval(pauseIntervalRef.current);
+            pauseIntervalRef.current = null;
+          }
           console.log("[Home] Scanning cooldown complete - ready to scan again");
         }, 30000); // 30 seconds = 30000ms
       }
