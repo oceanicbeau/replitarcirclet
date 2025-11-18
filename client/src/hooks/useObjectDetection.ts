@@ -24,16 +24,32 @@ export function useObjectDetection(options: UseObjectDetectionOptions = {}) {
   const captureFrame = useCallback((videoElement: HTMLVideoElement): string | null => {
     try {
       const canvas = document.createElement("canvas");
-      canvas.width = videoElement.videoWidth;
-      canvas.height = videoElement.videoHeight;
+      
+      // Resize to max 1024px on longest side to reduce file size
+      const maxDimension = 1024;
+      let width = videoElement.videoWidth;
+      let height = videoElement.videoHeight;
+      
+      if (width > maxDimension || height > maxDimension) {
+        if (width > height) {
+          height = (height / width) * maxDimension;
+          width = maxDimension;
+        } else {
+          width = (width / height) * maxDimension;
+          height = maxDimension;
+        }
+      }
+      
+      canvas.width = width;
+      canvas.height = height;
       
       const ctx = canvas.getContext("2d");
       if (!ctx) return null;
       
-      ctx.drawImage(videoElement, 0, 0);
+      ctx.drawImage(videoElement, 0, 0, width, height);
       
-      // Convert to base64 JPEG (smaller than PNG)
-      return canvas.toDataURL("image/jpeg", 0.8);
+      // Convert to base64 JPEG with good compression
+      return canvas.toDataURL("image/jpeg", 0.7);
     } catch (error) {
       console.error("[Detection] Failed to capture frame:", error);
       return null;
