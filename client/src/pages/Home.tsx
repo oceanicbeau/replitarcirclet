@@ -26,6 +26,8 @@ export default function Home() {
   const [showSubmissionForm, setShowSubmissionForm] = useState(false);
   const [showContactForm, setShowContactForm] = useState(false);
   const [detectionMode, setDetectionMode] = useState(false);
+  const [scanningPaused, setScanningPaused] = useState(false);
+  const [pauseTimeRemaining, setPauseTimeRemaining] = useState<number | null>(null);
   
   const { detect, isDetecting, lastResult, isActive, startContinuous, stopContinuous } = useObjectDetection({
     continuous: true,
@@ -145,6 +147,14 @@ export default function Home() {
     setDetectedObject(null);
     setMessages([]);
     setShowCamera(false);
+    
+    // If scanning was paused and user closes chat, keep it paused
+    if (scanningPaused && pauseTimeRemaining !== null) {
+      toast({
+        title: "Scanning Paused",
+        description: `Scanning will resume in ${pauseTimeRemaining} seconds`,
+      });
+    }
   };
 
   const startQuickDemo = (objectType: string) => {
@@ -184,6 +194,14 @@ export default function Home() {
   };
 
   const handleStartDetection = () => {
+    if (scanningPaused) {
+      toast({
+        title: "Scanning Paused",
+        description: `Please wait ${pauseTimeRemaining} seconds before scanning again`,
+        variant: "default"
+      });
+      return;
+    }
     setDetectionMode(true);
     setShowCamera(true);
   };
@@ -238,6 +256,26 @@ export default function Home() {
             timestamp: new Date()
           }
         );
+        
+        // Pause scanning for 1 minute (60 seconds)
+        setScanningPaused(true);
+        setPauseTimeRemaining(60);
+        
+        const pauseInterval = setInterval(() => {
+          setPauseTimeRemaining((prev) => {
+            if (prev === null || prev <= 1) {
+              return null;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+        
+        setTimeout(() => {
+          setScanningPaused(false);
+          setPauseTimeRemaining(null);
+          clearInterval(pauseInterval);
+          console.log("[Home] Scanning cooldown complete - ready to scan again");
+        }, 60000); // 1 minute = 60000ms
       }
       
       setMessages(initialMessages);
@@ -345,10 +383,13 @@ export default function Home() {
               className="bg-white hover:bg-gray-100 font-semibold rounded-xl py-8 w-full sm:w-auto sm:min-w-[300px]"
               style={{ color: "#1E88E5" }}
               onClick={handleStartDetection}
+              disabled={scanningPaused}
               data-testid="button-detect-object"
             >
               <Camera className="w-6 h-6 mr-2" />
-              Detect Object (AI)
+              {scanningPaused && pauseTimeRemaining !== null 
+                ? `Scanning Paused (${pauseTimeRemaining}s)` 
+                : "Detect Object (AI)"}
             </Button>
           </div>
         </div>
