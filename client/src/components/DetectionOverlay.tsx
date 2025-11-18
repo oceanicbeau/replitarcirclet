@@ -42,7 +42,7 @@ export default function DetectionOverlay({
   useEffect(() => {
     if (lastResult && lastResult.objectType === "circle-t-logo" && showConfirmation) {
       // Multi-burst confetti celebration!
-      const duration = 3000;
+      const duration = 5000;
       const end = Date.now() + duration;
 
       const colors = ['#1E88E5', '#4FC3F7', '#81D4FA', '#ffffff'];
