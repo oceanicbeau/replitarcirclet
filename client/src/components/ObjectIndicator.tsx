@@ -1,4 +1,3 @@
-import { CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface ObjectIndicatorProps {
@@ -19,8 +18,7 @@ export default function ObjectIndicator({ objectName, icon, accentColor }: Objec
           border: "2px solid #1E88E5"
         }}
       >
-        <span className="font-bold text-lg mr-2" style={{ color: "#1E88E5" }} data-testid="text-object-name">{objectName}</span>
-        <CheckCircle2 className="w-5 h-5" style={{ color: "#1E88E5" }} data-testid="icon-check" />
+        <span className="font-bold text-lg" style={{ color: "#1E88E5" }} data-testid="text-object-name">{objectName}</span>
       </div>
     </div>
   );
