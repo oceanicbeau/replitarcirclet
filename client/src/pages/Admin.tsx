@@ -116,19 +116,30 @@ export default function Admin() {
               >
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   {/* Photo Section */}
-                  {incident.photoUrl && (
-                    <div className="lg:col-span-1">
+                  <div className="lg:col-span-1">
+                    {incident.photoUrl ? (
                       <img
                         src={incident.photoUrl}
                         alt="Incident"
                         className="w-full h-48 object-cover rounded-xl"
                         data-testid={`incident-photo-${incident.id}`}
                       />
-                    </div>
-                  )}
+                    ) : (
+                      <div
+                        className="w-full h-48 rounded-xl flex items-center justify-center"
+                        style={{ background: "#f5f5f5", border: "1px solid #e0e0e0" }}
+                        data-testid={`incident-no-photo-${incident.id}`}
+                      >
+                        <div className="text-center text-gray-400">
+                          <Camera className="w-12 h-12 mx-auto mb-2" />
+                          <p className="text-sm">No photo captured</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
                   {/* Details Section */}
-                  <div className={incident.photoUrl ? "lg:col-span-2" : "lg:col-span-3"}>
+                  <div className="lg:col-span-2">
                     <div className="flex items-start justify-between mb-4">
                       <div>
                         <h3 className="text-xl font-bold mb-2" style={{ color: "#1E88E5" }} data-testid={`incident-type-${incident.id}`}>
