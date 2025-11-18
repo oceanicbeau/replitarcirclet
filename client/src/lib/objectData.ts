@@ -150,9 +150,9 @@ export const OBJECT_DATABASE: Record<string, ObjectData> = {
         response: "We back people to succeed in the digital age by maximising Microsoft 365 and enhancing it with our own tools. We design, build, deploy and manage digital workplaces and AI solutions, using Microsoft 365 collaboration tools, Azure AI Foundry and the Power Platform."
       },
       {
-        id: "info",
-        label: "About the app",
-        response: "This AR Assistant uses advanced AI to help council workers identify and handle waste bins, syringes, dog waste, and graffiti. Point your camera at different objects to try it out!"
+        id: "contact",
+        label: "Connect",
+        response: "mailto:service@circlet.com.au"
       }
     ],
     responses: {

@@ -122,6 +122,12 @@ export default function Home() {
       return;
     }
     
+    // Check if this is a mailto link
+    if (action.response.startsWith("mailto:")) {
+      window.location.href = action.response;
+      return;
+    }
+    
     setMessages((prev) => [
       ...prev,
       {
