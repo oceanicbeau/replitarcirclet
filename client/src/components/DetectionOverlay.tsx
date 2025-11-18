@@ -77,7 +77,7 @@ export default function DetectionOverlay({
   if (continuousMode) {
     // Continuous Real-time Detection Mode
     return (
-      <div className="absolute inset-0 flex flex-col" data-testid="container-detection-overlay">
+      <div className="absolute inset-0 flex flex-col z-20" data-testid="container-detection-overlay">
         {/* Close Button - Top Right */}
         <div className="absolute top-4 right-4 z-50">
           <Button
@@ -144,6 +144,9 @@ export default function DetectionOverlay({
                   <p className="text-white font-bold text-xl truncate">
                     {getObjectLabel(lastResult.objectType)}
                   </p>
+                  <p className="text-white/80 text-sm">
+                    {lastResult.confidence}% confident
+                  </p>
                 </div>
               </div>
               <Button
@@ -170,7 +173,7 @@ export default function DetectionOverlay({
 
   // Original Manual Capture Mode
   return (
-    <div className="absolute inset-0 flex flex-col" data-testid="container-detection-overlay">
+    <div className="absolute inset-0 flex flex-col z-20" data-testid="container-detection-overlay">
       {/* Header */}
       <div
         className="p-4 flex items-center justify-end"
@@ -206,8 +209,11 @@ export default function DetectionOverlay({
               <div className="w-16 h-16 rounded-full bg-green-500 mx-auto mb-4 flex items-center justify-center">
                 <Check className="w-8 h-8 text-white" />
               </div>
-              <p className="text-white font-bold text-xl mb-6">
+              <p className="text-white font-bold text-xl mb-2">
                 {getObjectLabel(lastResult.objectType)}
+              </p>
+              <p className="text-white/80 text-sm mb-6">
+                {lastResult.confidence}% confident
               </p>
               <div className="flex gap-3">
                 <Button
