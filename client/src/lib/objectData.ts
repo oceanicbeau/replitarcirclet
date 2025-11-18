@@ -146,8 +146,8 @@ export const OBJECT_DATABASE: Record<string, ObjectData> = {
     quickActions: [
       {
         id: "celebrate",
-        label: "What is this?",
-        response: "You've discovered a special easter egg! The Circle T logo represents the Council's commitment to innovation and technology. Thanks for testing the AR detection system!"
+        label: "About Circle T",
+        response: "We back people to succeed in the digital age by maximising Microsoft 365 and enhancing it with our own tools. We design, build, deploy and manage digital workplaces and AI solutions, using Microsoft 365 collaboration tools, Azure AI Foundry and the Power Platform."
       },
       {
         id: "info",
