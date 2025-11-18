@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, MapPin, Clock, Camera, FileText, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ObjectData } from "@shared/schema";
@@ -13,10 +13,36 @@ interface SubmissionFormProps {
 export default function SubmissionForm({ objectData, cameraRef, onClose }: SubmissionFormProps) {
   const [submitted, setSubmitted] = useState(false);
   const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
+  const [gpsCoordinates, setGpsCoordinates] = useState<string>("Fetching location...");
+  const [locationError, setLocationError] = useState(false);
+
+  useEffect(() => {
+    // Get user's GPS coordinates
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+          const latDir = lat >= 0 ? "N" : "S";
+          const lonDir = lon >= 0 ? "E" : "W";
+          setGpsCoordinates(
+            `${Math.abs(lat).toFixed(4)}° ${latDir}, ${Math.abs(lon).toFixed(4)}° ${lonDir}`
+          );
+        },
+        (error) => {
+          console.error("Geolocation error:", error);
+          setLocationError(true);
+          setGpsCoordinates("Location unavailable");
+        }
+      );
+    } else {
+      setLocationError(true);
+      setGpsCoordinates("Geolocation not supported");
+    }
+  }, []);
 
   const mockData = {
     address: "Garden City Playground",
-    gpsCoordinates: "40.7128° N, 74.0060° W",
     timestamp: new Date().toLocaleString()
   };
 
@@ -125,8 +151,11 @@ export default function SubmissionForm({ objectData, cameraRef, onClose }: Submi
                 border: "1px solid #e0e0e0"
               }}
             >
-              <p className="text-gray-900 font-mono text-sm" data-testid="text-gps">
-                {mockData.gpsCoordinates}
+              <p 
+                className={`font-mono text-sm ${locationError ? 'text-gray-500 italic' : 'text-gray-900'}`}
+                data-testid="text-gps"
+              >
+                {gpsCoordinates}
               </p>
             </div>
           </div>
