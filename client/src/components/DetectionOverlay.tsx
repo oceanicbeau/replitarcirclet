@@ -34,6 +34,7 @@ export default function DetectionOverlay({
       case "dog-poop": return "Dog Waste";
       case "water-bottle": return "Water Bottle";
       case "circle-t-logo": return "Circle T Logo";
+      case "pen": return "Pen";
       default: return "Unknown";
     }
   };

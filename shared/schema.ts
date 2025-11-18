@@ -81,7 +81,7 @@ export const insertContactSchema = contactBaseSchema.omit({
 export type InsertContact = z.infer<typeof insertContactSchema>;
 export type Contact = typeof contacts.$inferSelect;
 
-export type ObjectType = "graffiti" | "syringe" | "dog-poop" | "water-bottle" | "circle-t-logo";
+export type ObjectType = "graffiti" | "syringe" | "dog-poop" | "water-bottle" | "circle-t-logo" | "pen";
 
 export interface DetectedObject {
   type: ObjectType;

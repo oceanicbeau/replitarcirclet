@@ -159,6 +159,15 @@ export const OBJECT_DATABASE: Record<string, ObjectData> = {
       "celebration": "Confetti time! 🎊 Keep exploring the app to discover more features.",
       "team": "Built with innovation and care by the Circle T team. Happy detecting!"
     }
+  },
+  "pen": {
+    type: "pen",
+    name: "Pen",
+    icon: "✒️",
+    accentColor: "hsl(220, 70%, 50%)",
+    greeting: "Pen has been detected.",
+    quickActions: [],
+    responses: {}
   }
 };
 

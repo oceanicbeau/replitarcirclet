@@ -16,7 +16,7 @@ export interface DetectedObjectInfo {
 }
 
 export interface DetectionResult {
-  objectType: "graffiti" | "syringe" | "dog-poop" | "water-bottle" | "circle-t-logo" | "unknown";
+  objectType: "graffiti" | "syringe" | "dog-poop" | "water-bottle" | "circle-t-logo" | "pen" | "unknown";
   confidence: number;
   explanation: string;
   otherObjects: DetectedObjectInfo[];
@@ -32,12 +32,13 @@ PRIMARY TASK: Check if it contains any of these municipal objects:
 3. Dog waste (dog poop, feces)
 4. Water bottle or drink bottle (plastic bottles, beverage containers)
 5. Circle T Logo (a circular logo with the letter T, blue branding, council logo)
+6. Pen (ballpoint pen, writing pen, any type of pen)
 
 SECONDARY TASK: ALWAYS identify ALL other objects you see in the scene (cups, phones, computers, desks, walls, trees, roads, buildings, people, vehicles, signs, furniture, etc.)
 
 Respond with ONLY a JSON object in this exact format:
 {
-  "objectType": "graffiti" | "syringe" | "dog-poop" | "water-bottle" | "circle-t-logo" | "unknown",
+  "objectType": "graffiti" | "syringe" | "dog-poop" | "water-bottle" | "circle-t-logo" | "pen" | "unknown",
   "confidence": 0-100,
   "explanation": "brief explanation of what you see",
   "otherObjects": [
