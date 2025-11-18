@@ -14,6 +14,7 @@ import { ChatMessage, ObjectData, QuickAction } from "@shared/schema";
 import { useObjectDetection } from "@/hooks/useObjectDetection";
 import { useToast } from "@/hooks/use-toast";
 import logoUrl from "@assets/ttt_1763355102252.png";
+import confetti from "canvas-confetti";
 
 export default function Home() {
   const cameraRef = useRef<CameraViewRef>(null);
@@ -92,6 +93,44 @@ export default function Home() {
     };
   }, []);
 
+  // Automatic confetti and Circle T chatbot on page load
+  useEffect(() => {
+    // Start confetti animation
+    const duration = 3000; // 3 seconds
+    const end = Date.now() + duration;
+    const colors = ['#1E88E5', '#4FC3F7', '#81D4FA', '#ffffff'];
+
+    (function frame() {
+      confetti({
+        particleCount: 3,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0, y: 0.6 },
+        colors: colors
+      });
+      confetti({
+        particleCount: 3,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1, y: 0.6 },
+        colors: colors
+      });
+
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    })();
+
+    // After 3 seconds, show Circle T chatbot
+    const chatbotTimer = setTimeout(() => {
+      setShowCircleTChatbot(true);
+    }, duration);
+
+    return () => {
+      clearTimeout(chatbotTimer);
+    };
+  }, []); // Run only once on mount
+
   const startCooldown = () => {
     // Clear any existing cooldown timers first
     if (pauseIntervalRef.current) {
@@ -133,25 +172,36 @@ export default function Home() {
     if (object) {
       setDetectedObject(object);
       setShowScanner(false);
+      setShowCamera(true);
       
-      // For Circle T logo, show the iframe chatbot
+      const initialMessages = [
+        {
+          id: "1",
+          role: "bot" as const,
+          content: object.greeting,
+          timestamp: new Date()
+        }
+      ];
+      
+      // Add extra messages for Circle T logo
       if (object.type === "circle-t-logo") {
-        cameraRef.current?.stopStream(); // Stop the camera stream
-        setShowCamera(false); // Ensure camera is off
-        setShowCircleTChatbot(true);
-        startCooldown(); // Apply cooldown for Circle T
-      } else {
-        setShowCamera(true);
-        const initialMessages = [
+        initialMessages.push(
           {
-            id: "1",
+            id: "2",
             role: "bot" as const,
-            content: object.greeting,
+            content: "Visit Circle T at www.circlet.com.au",
+            timestamp: new Date()
+          },
+          {
+            id: "3",
+            role: "bot" as const,
+            content: "We deliver business outcomes to digitally transform the global workplace.",
             timestamp: new Date()
           }
-        ];
-        setMessages(initialMessages);
+        );
       }
+      
+      setMessages(initialMessages);
     } else {
       console.error("Unknown object QR code");
     }
@@ -286,22 +336,34 @@ export default function Home() {
     if (object) {
       setDetectedObject(object);
       
-      // For Circle T logo, show the iframe chatbot instead of regular chat
+      const initialMessages = [
+        {
+          id: "1",
+          role: "bot" as const,
+          content: object.greeting,
+          timestamp: new Date()
+        }
+      ];
+      
+      // Add extra messages for Circle T logo
       if (object.type === "circle-t-logo") {
-        cameraRef.current?.stopStream(); // Stop the camera stream
-        setShowCamera(false); // Ensure camera is off
-        setShowCircleTChatbot(true);
-      } else {
-        const initialMessages = [
+        initialMessages.push(
           {
-            id: "1",
+            id: "2",
             role: "bot" as const,
-            content: object.greeting,
+            content: "Visit Circle T at www.circlet.com.au",
+            timestamp: new Date()
+          },
+          {
+            id: "3",
+            role: "bot" as const,
+            content: "We deliver business outcomes to digitally transform the global workplace.",
             timestamp: new Date()
           }
-        ];
-        setMessages(initialMessages);
+        );
       }
+      
+      setMessages(initialMessages);
       
       // Apply 30-second cooldown for syringe, pen, and circle-t-logo
       if (object.type === "syringe" || object.type === "pen" || object.type === "circle-t-logo") {
