@@ -91,7 +91,7 @@ export default function Admin() {
             boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)"
           }}
         >
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               <Link href="/">
                 <Button
@@ -111,32 +111,34 @@ export default function Admin() {
               </div>
             </div>
             {incidents && (
-              <div className="text-white flex items-center gap-6">
-                <div className="flex items-center gap-4">
-                  <div className="text-center px-3 py-2 rounded-lg bg-white/10">
-                    <div className="text-xl font-bold" data-testid="text-graffiti-count">
-                      {counts.graffiti}
+              <div className="text-white w-full sm:w-auto">
+                <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-6">
+                  <div className="flex items-center gap-2 sm:gap-4">
+                    <div className="text-center px-2 sm:px-3 py-2 rounded-lg bg-white/10">
+                      <div className="text-lg sm:text-xl font-bold" data-testid="text-graffiti-count">
+                        {counts.graffiti}
+                      </div>
+                      <div className="text-xs text-white/90">Graffiti</div>
                     </div>
-                    <div className="text-xs text-white/90">Graffiti</div>
-                  </div>
-                  <div className="text-center px-3 py-2 rounded-lg bg-white/10">
-                    <div className="text-xl font-bold" data-testid="text-syringe-count">
-                      {counts.syringe}
+                    <div className="text-center px-2 sm:px-3 py-2 rounded-lg bg-white/10">
+                      <div className="text-lg sm:text-xl font-bold" data-testid="text-syringe-count">
+                        {counts.syringe}
+                      </div>
+                      <div className="text-xs text-white/90">Syringe</div>
                     </div>
-                    <div className="text-xs text-white/90">Syringe</div>
-                  </div>
-                  <div className="text-center px-3 py-2 rounded-lg bg-white/10">
-                    <div className="text-xl font-bold" data-testid="text-dogwaste-count">
-                      {counts.dogWaste}
+                    <div className="text-center px-2 sm:px-3 py-2 rounded-lg bg-white/10">
+                      <div className="text-lg sm:text-xl font-bold" data-testid="text-dogwaste-count">
+                        {counts.dogWaste}
+                      </div>
+                      <div className="text-xs text-white/90">Dog Waste</div>
                     </div>
-                    <div className="text-xs text-white/90">Dog Waste</div>
                   </div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold" data-testid="text-incident-count">
-                    {incidents.length}
+                  <div className="text-center px-3 py-2 rounded-lg bg-white/20">
+                    <div className="text-2xl sm:text-3xl font-bold" data-testid="text-incident-count">
+                      {incidents.length}
+                    </div>
+                    <div className="text-xs sm:text-sm text-white/90">Total</div>
                   </div>
-                  <div className="text-sm text-white/90">Total</div>
                 </div>
               </div>
             )}
