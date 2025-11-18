@@ -159,12 +159,13 @@ export default function Home() {
   const handleConfirmDetection = (objectType: string) => {
     console.log("[Home] Confirming detection:", objectType);
     stopContinuous();
+    setDetectionMode(false); // Turn off detection mode FIRST
     
     const object = getObjectByQRCode(objectType);
     
     if (object) {
       setDetectedObject(object);
-      setDetectionMode(false);
+      // Camera stays open but now shows chat overlay
       setMessages([
         {
           id: "1",

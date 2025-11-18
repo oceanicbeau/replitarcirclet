@@ -31,8 +31,8 @@ export function useObjectDetection(options: UseObjectDetectionOptions = {}) {
     try {
       const canvas = document.createElement("canvas");
       
-      // Resize to max 1024px on longest side to reduce file size
-      const maxDimension = 1024;
+      // Resize to max 640px to prevent payload too large errors
+      const maxDimension = 640;
       let width = videoElement.videoWidth;
       let height = videoElement.videoHeight;
       
@@ -54,8 +54,8 @@ export function useObjectDetection(options: UseObjectDetectionOptions = {}) {
       
       ctx.drawImage(videoElement, 0, 0, width, height);
       
-      // Convert to base64 JPEG with good compression
-      return canvas.toDataURL("image/jpeg", 0.7);
+      // Convert to base64 JPEG with higher compression (0.6 instead of 0.7)
+      return canvas.toDataURL("image/jpeg", 0.6);
     } catch (error) {
       console.error("[Detection] Failed to capture frame:", error);
       return null;
