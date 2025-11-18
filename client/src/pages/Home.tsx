@@ -19,8 +19,6 @@ import confetti from "canvas-confetti";
 export default function Home() {
   const cameraRef = useRef<CameraViewRef>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const pauseIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const pauseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
   
   const [showScanner, setShowScanner] = useState(false);
@@ -30,8 +28,6 @@ export default function Home() {
   const [showSubmissionForm, setShowSubmissionForm] = useState(false);
   const [showContactForm, setShowContactForm] = useState(false);
   const [detectionMode, setDetectionMode] = useState(false);
-  const [scanningPaused, setScanningPaused] = useState(false);
-  const [pauseTimeRemaining, setPauseTimeRemaining] = useState<number | null>(null);
   const [showCircleTChatbot, setShowCircleTChatbot] = useState(false);
   
   const { detect, isDetecting, lastResult, isActive, startContinuous, stopContinuous } = useObjectDetection({
@@ -81,18 +77,6 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [detectionMode, showCamera]); // Removed startContinuous to prevent re-runs
 
-  // Cleanup cooldown timers on component unmount
-  useEffect(() => {
-    return () => {
-      if (pauseIntervalRef.current) {
-        clearInterval(pauseIntervalRef.current);
-      }
-      if (pauseTimeoutRef.current) {
-        clearTimeout(pauseTimeoutRef.current);
-      }
-    };
-  }, []);
-
   // Automatic confetti and Circle T chatbot on page load
   useEffect(() => {
     // Start confetti animation
@@ -130,40 +114,6 @@ export default function Home() {
       clearTimeout(chatbotTimer);
     };
   }, []); // Run only once on mount
-
-  const startCooldown = () => {
-    // Clear any existing cooldown timers first
-    if (pauseIntervalRef.current) {
-      clearInterval(pauseIntervalRef.current);
-      pauseIntervalRef.current = null;
-    }
-    if (pauseTimeoutRef.current) {
-      clearTimeout(pauseTimeoutRef.current);
-      pauseTimeoutRef.current = null;
-    }
-    
-    setScanningPaused(true);
-    setPauseTimeRemaining(30);
-    
-    pauseIntervalRef.current = setInterval(() => {
-      setPauseTimeRemaining((prev) => {
-        if (prev === null || prev <= 1) {
-          return 0; // Clamp at zero
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    
-    pauseTimeoutRef.current = setTimeout(() => {
-      setScanningPaused(false);
-      setPauseTimeRemaining(null);
-      if (pauseIntervalRef.current) {
-        clearInterval(pauseIntervalRef.current);
-        pauseIntervalRef.current = null;
-      }
-      console.log("[Home] Scanning cooldown complete - ready to scan again");
-    }, 30000); // 30 seconds = 30000ms
-  };
 
   const handleScan = (qrCode: string) => {
     console.log("QR Code scanned:", qrCode);
@@ -237,28 +187,12 @@ export default function Home() {
     setDetectedObject(null);
     setMessages([]);
     setShowCamera(false);
-    
-    // If scanning was paused and user closes chat, keep it paused
-    if (scanningPaused && pauseTimeRemaining !== null) {
-      toast({
-        title: "Scanning Paused",
-        description: `Scanning will resume in ${pauseTimeRemaining} seconds`,
-      });
-    }
   };
 
   const handleCloseCircleTChatbot = () => {
     setShowCircleTChatbot(false);
     setDetectedObject(null);
     setShowCamera(false); // Ensure camera stays off
-    
-    // If scanning was paused and user closes chatbot, keep it paused
-    if (scanningPaused && pauseTimeRemaining !== null) {
-      toast({
-        title: "Scanning Paused",
-        description: `Scanning will resume in ${pauseTimeRemaining} seconds`,
-      });
-    }
   };
 
   const startQuickDemo = (objectType: string) => {
@@ -298,14 +232,6 @@ export default function Home() {
   };
 
   const handleStartDetection = () => {
-    if (scanningPaused) {
-      toast({
-        title: "Scanning Paused",
-        description: `Please wait ${pauseTimeRemaining} seconds before scanning again`,
-        variant: "default"
-      });
-      return;
-    }
     setDetectionMode(true);
     setShowCamera(true);
   };
@@ -364,11 +290,6 @@ export default function Home() {
       }
       
       setMessages(initialMessages);
-      
-      // Apply 30-second cooldown for syringe, pen, and circle-t-logo
-      if (object.type === "syringe" || object.type === "pen" || object.type === "circle-t-logo") {
-        startCooldown();
-      }
     }
   };
 
@@ -483,13 +404,10 @@ export default function Home() {
               className="bg-white hover:bg-gray-100 font-semibold rounded-xl py-8 w-full sm:w-auto sm:min-w-[300px]"
               style={{ color: "#1E88E5" }}
               onClick={handleStartDetection}
-              disabled={scanningPaused}
               data-testid="button-detect-object"
             >
               <Camera className="w-6 h-6 mr-2" />
-              {scanningPaused && pauseTimeRemaining !== null 
-                ? `Scanning Paused (${pauseTimeRemaining}s)` 
-                : "Detect Object (AI)"}
+              Detect Object (AI)
             </Button>
           </div>
         </div>
