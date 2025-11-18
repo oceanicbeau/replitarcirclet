@@ -102,16 +102,10 @@ export default function DetectionOverlay({
           {isPaused && !showConfirmation ? (
             <div className="flex items-center gap-4" data-testid="container-paused">
               <div className="w-8 h-8 rounded-full border-4 border-white/30" />
-              <p className="text-white font-bold text-lg">
-                Scanning paused (30s)
-              </p>
             </div>
           ) : isDetecting ? (
             <div className="flex items-center gap-4" data-testid="container-scanning">
               <ScanLine className="w-8 h-8 text-white animate-pulse" />
-              <p className="text-white font-bold text-lg">
-                Scanning...
-              </p>
             </div>
           ) : lastResult && showConfirmation ? (
             <div className="w-full flex items-center justify-between gap-4" data-testid="container-detected">
@@ -128,25 +122,6 @@ export default function DetectionOverlay({
                   <p className="text-white font-bold text-xl truncate">
                     {getObjectLabel(lastResult.objectType)}
                   </p>
-                  <p className="text-white/80 text-sm">
-                    {lastResult.confidence}% confident
-                  </p>
-                  {lastResult.otherObjects && lastResult.otherObjects.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-1">
-                      {lastResult.otherObjects.slice(0, 3).map((obj, idx) => (
-                        <span
-                          key={idx}
-                          className="text-white/60 text-xs px-2 py-0.5 rounded-full"
-                          style={{
-                            backgroundColor: "rgba(255, 255, 255, 0.15)"
-                          }}
-                          data-testid={`tag-other-object-${idx}`}
-                        >
-                          {obj.name}
-                        </span>
-                      ))}
-                    </div>
-                  )}
                 </div>
               </div>
               <Button
@@ -176,12 +151,9 @@ export default function DetectionOverlay({
     <div className="absolute inset-0 flex flex-col" data-testid="container-detection-overlay">
       {/* Header */}
       <div
-        className="p-4 flex items-center justify-between"
+        className="p-4 flex items-center justify-end"
         style={{ backdropFilter: "blur(10px)", backgroundColor: "rgba(0,0,0,0.3)" }}
       >
-        <span className="text-white font-semibold text-lg" data-testid="text-detection-mode">
-          Object Detection
-        </span>
         <Button
           size="icon"
           variant="ghost"
@@ -205,27 +177,15 @@ export default function DetectionOverlay({
         >
           {isDetecting ? (
             <div data-testid="container-detecting">
-              <Loader2 className="w-12 h-12 text-white mx-auto mb-3 animate-spin" />
-              <p className="text-white font-semibold text-lg">
-                Analyzing image...
-              </p>
-              <p className="text-white/70 text-sm mt-1">
-                Please wait
-              </p>
+              <Loader2 className="w-12 h-12 text-white mx-auto animate-spin" />
             </div>
           ) : showConfirmation ? (
             <div data-testid="container-confirmation">
               <div className="w-16 h-16 rounded-full bg-green-500 mx-auto mb-4 flex items-center justify-center">
                 <Check className="w-8 h-8 text-white" />
               </div>
-              <p className="text-white font-bold text-xl mb-2">
-                {getObjectLabel(lastResult.objectType)} Detected
-              </p>
-              <p className="text-white/80 text-sm mb-4">
-                Confidence: {lastResult.confidence}%
-              </p>
-              <p className="text-white/70 text-sm mb-6">
-                Is this correct?
+              <p className="text-white font-bold text-xl mb-6">
+                {getObjectLabel(lastResult.objectType)}
               </p>
               <div className="flex gap-3">
                 <Button
@@ -234,14 +194,14 @@ export default function DetectionOverlay({
                   onClick={onClose}
                   data-testid="button-cancel-detection"
                 >
-                  No, try again
+                  <X className="w-4 h-4" />
                 </Button>
                 <Button
                   className="flex-1 bg-green-600 hover:bg-green-700"
                   onClick={() => onConfirm && onConfirm(lastResult.objectType)}
                   data-testid="button-confirm-detection"
                 >
-                  Yes, continue
+                  <Check className="w-4 h-4" />
                 </Button>
               </div>
             </div>
