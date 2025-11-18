@@ -14,13 +14,14 @@ export default function SubmissionForm({ objectData, cameraRef, onClose }: Submi
   const [submitted, setSubmitted] = useState(false);
   const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
   const [gpsCoordinates, setGpsCoordinates] = useState<string>("Fetching location...");
+  const [locationName, setLocationName] = useState<string>("Fetching location...");
   const [locationError, setLocationError] = useState(false);
 
   useEffect(() => {
     // Get user's GPS coordinates
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
+        async (position) => {
           const lat = position.coords.latitude;
           const lon = position.coords.longitude;
           const latDir = lat >= 0 ? "N" : "S";
@@ -28,21 +29,55 @@ export default function SubmissionForm({ objectData, cameraRef, onClose }: Submi
           setGpsCoordinates(
             `${Math.abs(lat).toFixed(4)}° ${latDir}, ${Math.abs(lon).toFixed(4)}° ${lonDir}`
           );
+
+          // Reverse geocoding to get place name
+          try {
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`,
+              {
+                headers: {
+                  'User-Agent': 'Council-AR-Assistant'
+                }
+              }
+            );
+            const data = await response.json();
+            
+            // Extract a meaningful place name from the response
+            const address = data.address || {};
+            const placeName = 
+              address.amenity ||
+              address.building ||
+              address.park ||
+              address.road ||
+              address.suburb ||
+              address.neighbourhood ||
+              address.village ||
+              address.town ||
+              address.city ||
+              data.display_name?.split(',')[0] ||
+              "Location";
+            
+            setLocationName(placeName);
+          } catch (error) {
+            console.error("Reverse geocoding error:", error);
+            setLocationName("Location");
+          }
         },
         (error) => {
           console.error("Geolocation error:", error);
           setLocationError(true);
           setGpsCoordinates("Location unavailable");
+          setLocationName("Location unavailable");
         }
       );
     } else {
       setLocationError(true);
       setGpsCoordinates("Geolocation not supported");
+      setLocationName("Geolocation not supported");
     }
   }, []);
 
   const mockData = {
-    address: "Garden City Playground",
     timestamp: new Date().toLocaleString()
   };
 
@@ -130,8 +165,11 @@ export default function SubmissionForm({ objectData, cameraRef, onClose }: Submi
                 border: "1px solid #e0e0e0"
               }}
             >
-              <p className="text-gray-900 font-medium" data-testid="text-address">
-                {mockData.address}
+              <p 
+                className={`font-medium ${locationError ? 'text-gray-500 italic' : 'text-gray-900'}`}
+                data-testid="text-address"
+              >
+                {locationName}
               </p>
             </div>
           </div>
