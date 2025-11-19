@@ -107,7 +107,7 @@ export default function DetectionOverlay({
                   background: 'linear-gradient(to bottom, transparent, rgba(30, 136, 229, 0.8), rgba(30, 136, 229, 1), rgba(30, 136, 229, 0.8), transparent)',
                   boxShadow: '0 0 20px rgba(30, 136, 229, 0.8), 0 0 40px rgba(30, 136, 229, 0.4)',
                   height: '4px',
-                  animation: 'scanDown 3s ease-in-out infinite'
+                  animation: 'scanDown 4s ease-in-out infinite'
                 }}
               />
             </div>
